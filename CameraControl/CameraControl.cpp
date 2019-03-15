@@ -16,13 +16,11 @@ int main(){
 	PvSystem *lSystem = (PvSystem *) malloc(sizeof(PvSystem));
 	if(lSystem == NULL){ cout << "Malloc Failure" << endl; return -1; }
 	const PvString MAC = "00:11:1c:03:09:12";
-	const PvDeviceInfo *lCameraInfo = (const PvDeviceInfo *) malloc(sizeof(const PvDeviceInfo));
-	if(lCameraInfo == NULL) { cout << "Malloc Failure" << endl; return -1; }
 
 	
 	//Connect to Camera
 	PvDevice *lCamera;
-	lCamera = connect( MAC, lCameraInfo );
+	lCamera = connect( MAC );
 
 	int status = 0;
 	if(lCamera != NULL)
@@ -35,7 +33,7 @@ int main(){
 
 	else status = -1;
 	
-	free(lSystem); free( (PvDeviceInfo *) lCameraInfo );
+	free(lSystem);
 
 	return status;
 
