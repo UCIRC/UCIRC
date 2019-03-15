@@ -29,3 +29,9 @@ Decisions/Choices to be Made:
 ===========================
 Frequency of Data collection
 Whether Data Collection will be always on or started on the ground
+
+Notes to Self/To do:
+====================
+Read up on PvSystemEventSink
+Read up on instantiating own classes
+Figure out if this will be necessary (hunch says yes)
