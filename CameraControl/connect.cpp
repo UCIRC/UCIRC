@@ -9,7 +9,7 @@
 #include <PvResult.h>
 #include <stdlib.h>
 
-
+//Returns pointer to PvDevice Object
 PvDevice *connect( const PvString MAC ){
 	PvResult lResult;
 	//Find Device via MAC
@@ -31,6 +31,9 @@ PvDevice *connect( const PvString MAC ){
 	return lCamera;
 }
 
+
+//Returns -1 if Failed, 0 if Success
+//DOES NOT FREE DEVICE
 int disconnect( PvDevice *lCamera ){
     PvResult lResult;
 	cout << "Disconnecting from device..." << endl;
