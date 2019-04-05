@@ -14,9 +14,58 @@
 #include <PvSystemEnums.h>
 #include <PvSampleUtils.h>
 
+#define BUFFER_COUNT ( 6 )
+
 void clean_up( const PvDeviceInfo *lCameraInfo,
 			   PvDevice *lCamera,
-			   PvStream *lStream )
+			   PvStream *lStream,
+			   PvPipeline *lPipeline );
+PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream );
+
+
+int main(){
+	PvSystem lSystem;
+	const PvDeviceInfo *lCameraInfo;
+	const PvString MAC = "00:11:1c:03:09:12";
+	PvResult lResult;
+	PvDevice *lCamera = NULL;
+	PvStream *lStream = NULL;
+	PvPipeline *lPipeline = NULL;
+
+	//Check if Device can be connected to
+	lResult = lSystem.FindDevice( MAC, &lCameraInfo );
+	if( !lResult.IsOK() ){ cout << "Could not find device at " << MAC.GetAscii() << endl; return -1; }
+
+	
+	//Connect to Camera
+	lCamera = connect( MAC );
+	if( lCamera != NULL )
+	{
+		lStream = open_stream( lCameraInfo );
+		if( lStream != NULL )
+		{	 
+			ConfigureStream( lCamera, lStream );
+			lPipeline = CreatePipeline( lCamera, lStream );
+			if( lPipeline != NULL )
+			{
+//				AcquireImages( lCamera, lStream, lPipeline );
+				delete lPipeline;
+			}
+		}
+	}
+	cout << "Cleaning up..." << endl;
+	clean_up(lCameraInfo, lCamera, lStream, lPipeline);
+	cout << "Terminating program" << endl;	
+
+	return 0;
+}
+
+
+
+void clean_up( const PvDeviceInfo *lCameraInfo,
+			   PvDevice *lCamera,
+			   PvStream *lStream,
+			   PvPipeline *lPipeline )
 {
 	cout << "Freeing Camera Info" << endl;
 	delete lCameraInfo;
@@ -34,55 +83,28 @@ void clean_up( const PvDeviceInfo *lCameraInfo,
 		cout << "Freeing Stream" << endl;
 		PvStream::Free( lStream );
 	}
+	
+	cout << "Freeing Pipeline" << endl;
+	delete lPipeline;
 
 	return; 
 }
 
-int main(){
-	PvSystem lSystem;
-	const PvDeviceInfo *lCameraInfo;// = new(nothrow) (PvDeviceInfo);
-//	if(lCameraInfo == NULL){ cout << "Allocation Failure" << endl; return -1; }
-	const PvString MAC = "00:11:1c:03:09:12";
-	PvResult lResult;
-	PvDevice *lCamera = NULL;
-	PvStream *lStream = NULL;
-	PvPipeline *lPipeline = NULL;
+PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream )
+{
+    // Create the PvPipeline object
+    PvPipeline* lPipeline = new PvPipeline( aStream );
 
-	//Check if Device can be connected to
-	lResult = lSystem.FindDevice( MAC, &lCameraInfo );
-	if( !lResult.IsOK() ){ cout << "Could not find device at " << MAC.GetAscii() << endl; return -1; }
+    if ( lPipeline != NULL )
+    {
+        // Reading payload size from device
+        uint32_t lSize = aDevice->GetPayloadSize();
 
-	
-	//Connect to Camera
-	lCamera = connect( MAC );
-	if( lCamera == NULL )
-	{
-		cout << "Cleaning up..." << endl;
-		clean_up(lCameraInfo, lCamera, lStream); 
-		cout << "Terminating program" << endl;
-		return -1; 
-	}
+        // Set the Buffer count and the Buffer size
+        lPipeline->SetBufferCount( BUFFER_COUNT );
+        lPipeline->SetBufferSize( lSize );
+    }
 
-	lStream = open_stream( lCameraInfo );
-	if( lStream == NULL )
-	{ 
-		cout << "Cleaning up..." << endl;
-		clean_up(lCameraInfo, lCamera, lStream);
-		cout << "Terminating program" << endl;	
-		return -1;
-	}	
-
-	ConfigureStream( lCamera, lStream );
-	lPipeline = CreatePipeline( lCamera, lStream );
-	if( lPipeline )
-	{
-		AcquireImages( lCamera, lStream, lPipeline );
-		delete lPipeline;
-	}
-	
-	cout << "Cleaning up..." << endl;
-	clean_up(lCameraInfo, lCamera, lStream);
-	cout << "Terminating program" << endl;	
-
-	return 0;
+    return lPipeline;
 }
+
