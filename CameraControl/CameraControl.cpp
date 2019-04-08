@@ -1,6 +1,7 @@
 #include "lib/connect.h"
 #include "lib/stream.h"
 #include "lib/ImageAcquisition.h"
+#include "lib/ConfigurationReader.cpp"
 #include <stdlib.h>
 #include <PvSystem.h>
 #include <PvDevice.h>
@@ -15,6 +16,10 @@
 #include <PvSampleUtils.h>
 
 #define BUFFER_COUNT ( 6 )
+
+
+
+
 
 void clean_up( const PvDeviceInfo *lCameraInfo,
 			   PvDevice *lCamera,
