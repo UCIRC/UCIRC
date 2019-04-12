@@ -21,18 +21,17 @@ Reason this file exists:
 #include <PvConfigurationReader.h>
 
 
-PV_INIT_SIGNAL_HANDLER();
+//PV_INIT_SIGNAL_HANDLER();
 
 //FileName of the Config File
 #define FILE_NAME ( "CameraConfig.pvxml" )
 
 #define DEVICE_CONFIGURATION_TAG ( "DeviceConfiguration" )
 #define STREAM_CONFIGURAITON_TAG ( "StreamConfiguration" )
+#define STRING_INFORMATION_TAG ( "StringInformation" )
 
+#define TEST_STRING ( "This is a test string" )
 
-
-//
-//  Store device and stream configuration.
 //  Does so with some sort of ConnectionID
 //  ->IP
 //	->MAV
@@ -138,7 +137,7 @@ Uses the Congiration file defined above to:
 ->Returns NULL pointer in case of failure
 */
 
-PvSstream *RestoreStream()
+PvStream *RestoreStream()
 {
     PvConfigurationReader lReader;
     

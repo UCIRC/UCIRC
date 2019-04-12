@@ -12,11 +12,11 @@
 
 PV_INIT_SIGNAL_HANDLER();
 
-#define BUFFER_COUNT ( 6 )
+#define BUFFER_COUNT ( 1 )
+#define IMAGE_COUNT  ( 1 )
 
 
-
-void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline, int Count )
+void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline )
 {
     // Get device parameters need to control streaming
     PvGenParameterArray *lDeviceParams = aDevice->GetParameters();
@@ -39,84 +39,67 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
     // Enable streaming and send the AcquisitionStart command
     cout << "Enabling streaming and sending AcquisitionStart command." << endl;
     aDevice->StreamEnable();
-    lStart->Execute();
+    cout << "Stream Enabled" << endl;
+	lStart->Execute();
+	cout << "Start Executed" << endl;
 
-//    char lDoodle[] = "|\\-|-/";
-//    int lDoodleIndex = 0;
-//    double lFrameRateVal = 0.0;
     double lBandwidthVal = 0.0;
 
-    // Acquire images until the user instructs us to stop.
-//    cout << endl << "<press a key to stop streaming>" << endl;
-    for(int i=0; i<Count; i++)
+    for(int i=0; i<IMAGE_COUNT; i++)
     {
         PvBuffer *lBuffer = NULL;
         PvResult lOperationResult;
 
         // Retrieve next buffer
-        PvResult lResult = aPipeline->RetrieveNextBuffer( &lBuffer, 1000, &lOperationResult );
+		cout << "Retrieving Next Buffer" << endl;
+        PvResult lResult = aPipeline->RetrieveNextBuffer( &lBuffer, 10000, &lOperationResult );
         if ( lResult.IsOK() )
         {
             if ( lOperationResult.IsOK() )
             {
                 PvPayloadType lType;
 
-                //
-                // We now have a valid buffer. This is where you would typically process the buffer.
-                // -----------------------------------------------------------------------------------------
-                // ...
-
-//                lFrameRate->GetValue( lFrameRateVal );
                 lBandwidth->GetValue( lBandwidthVal );
 
-                // If the buffer contains an image, display width and height.
-//                uint32_t lWidth = 0, lHeight = 0;
                 lType = lBuffer->GetPayloadType();
-
-//                cout << fixed << setprecision( 1 );
-//                cout << lDoodle[ lDoodleIndex ];
-//                cout << " BlockID: " << uppercase << hex << setfill( '0' ) << setw( 16 ) << lBuffer->GetBlockID();
+				//Check if Payload Type is Image
                 if ( lType == PvPayloadTypeImage )
                 {
                     // Get image specific buffer interface.
-//                    PvImage *lImage = lBuffer->GetImage();
+                    PvImage *lImage = lBuffer->GetImage();
 					PvResult lResult;
 					const char *file = "image";
 					const PvString Filename =  PvString(file);
 					uint32_t *BytesWritten = NULL;
 					PvBufferFormatType Format = PvBufferFormatBMP;
-					PvBufferWriter Writer;
-					lResult = Writer.Store(lBuffer, Filename);
+					PvBufferWriter lWriter;
+					lResult = lWriter.Store(lBuffer, Filename);
 					if( !lResult.IsOK() )
 					{
 						cout << "Failed to Save Image" << endl;
 					}
-                    // Read width, height.
-  //                  lWidth = lImage->GetWidth();
-    //                lHeight = lImage->GetHeight();
-      //              cout << "  W: " << dec << lWidth << " H: " << lHeight;
                 }
                 else {
                     cout << " (buffer does not contain image)";
                 }
-        //        cout << "  " << lFrameRateVal << " FPS  " << ( lBandwidthVal / 1000000.0 ) << " Mb/s   \r";
             }
             else
             {
+				cout << "Operational Result Failure" << endl;
                 // Non OK operational result
-                cout  << lOperationResult.GetCodeString().GetAscii() << "\r";
+                cout  << lOperationResult.GetCodeString().GetAscii() << endl;
             }
-
+			cout << "Realeasing Buffer" << endl;
             // Release the buffer back to the pipeline
             aPipeline->ReleaseBuffer( lBuffer );
         }
         else
         {
+			cout << "Failed to retrieve buffer" << endl;
             // Retrieve buffer failure
-            cout << " " << lResult.GetCodeString().GetAscii() << "\r";
+            cout << " " << lResult.GetCodeString().GetAscii() << endl;
+			continue;
         }
-
-//        ++lDoodleIndex %= 6;
     }
 
     PvGetChar(); // Flush key buffer for next stop.

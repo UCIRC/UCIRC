@@ -25,6 +25,7 @@ PvStream *open_stream ( const PvDeviceInfo *lCameraInfo ){
 
 int close_stream ( PvStream *lStream ){
 	PvResult lResult;
+	cout << "Closing Stream..." << endl;
 	lResult = lStream->Close();
 	if( !lResult.IsOK() ){
 		cout << "Failed to close the stream" << endl;

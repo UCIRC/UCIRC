@@ -1,7 +1,7 @@
 #include "lib/connect.h"
 #include "lib/stream.h"
 #include "lib/ImageAcquisition.h"
-#include "lib/ConfigurationReader.cpp"
+#include "lib/ConfigurationReader.h"
 #include <stdlib.h>
 #include <PvSystem.h>
 #include <PvDevice.h>
@@ -15,25 +15,24 @@
 #include <PvSystemEnums.h>
 #include <PvSampleUtils.h>
 
-#define BUFFER_COUNT ( 6 )
-
+#define BUFFER_COUNT ( 1 )
+#define MAC_ADDRESS   ( "00:50:c2:1d:70:ff" )
 
 
 
 
 void clean_up( const PvDeviceInfo *lCameraInfo,
 			   PvDevice *lCamera,
-			   PvStream *lStream,
-			   PvPipeline *lPipeline );
+			   PvStream *lStream);
 PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream );
 
 
 int main(){
 	PvSystem lSystem;
 	const PvDeviceInfo *lCameraInfo;
-	const PvString MAC = "00:11:1c:03:09:12";
+	const PvString MAC = PvString( MAC_ADDRESS );
 	PvResult lResult;
-	PvDevice *lCamera = NULL;
+	PvDevice *lCamera  = NULL;
 	PvStream *lStream = NULL;
 	PvPipeline *lPipeline = NULL;
 
@@ -53,13 +52,13 @@ int main(){
 			lPipeline = CreatePipeline( lCamera, lStream );
 			if( lPipeline != NULL )
 			{
-//				AcquireImages( lCamera, lStream, lPipeline );
+	//			AcquireImages( lCamera, lStream, lPipeline );
 				delete lPipeline;
 			}
 		}
 	}
 	cout << "Cleaning up..." << endl;
-	clean_up(lCameraInfo, lCamera, lStream, lPipeline);
+	clean_up(lCameraInfo, lCamera, lStream);
 	cout << "Terminating program" << endl;	
 
 	return 0;
@@ -69,28 +68,25 @@ int main(){
 
 void clean_up( const PvDeviceInfo *lCameraInfo,
 			   PvDevice *lCamera,
-			   PvStream *lStream,
-			   PvPipeline *lPipeline )
+			   PvStream *lStream)
 {
 	cout << "Freeing Camera Info" << endl;
 	delete lCameraInfo;
 	
 	if( lCamera != NULL )
 	{
-		while( disconnect( lCamera ) != -1 );	
+		while( disconnect( lCamera ) != 0 );	
 		cout << "Freeing Camera" << endl;
  		PvDevice::Free( lCamera ); 
 	}
 	
 	if( lStream != NULL )
 	{
-		while( close_stream( lStream ) != -1 );
+		while( close_stream( lStream ) != 0 );
 		cout << "Freeing Stream" << endl;
 		PvStream::Free( lStream );
 	}
 	
-	cout << "Freeing Pipeline" << endl;
-	delete lPipeline;
 
 	return; 
 }
