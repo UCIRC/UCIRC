@@ -16,7 +16,7 @@
 #include <PvSampleUtils.h>
 
 #define BUFFER_COUNT ( 1 )
-#define MAC_ADDRESS   ( "00:50:c2:1d:70:ff" )
+#define MAC_ADDRESS   ( "00:11:1c:02:cd:77" )
 
 
 
@@ -52,7 +52,7 @@ int main(){
 			lPipeline = CreatePipeline( lCamera, lStream );
 			if( lPipeline != NULL )
 			{
-	//			AcquireImages( lCamera, lStream, lPipeline );
+				AcquireImages( lCamera, lStream, lPipeline );
 				delete lPipeline;
 			}
 		}

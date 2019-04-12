@@ -92,17 +92,17 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline 
 			cout << "Realeasing Buffer" << endl;
             // Release the buffer back to the pipeline
             aPipeline->ReleaseBuffer( lBuffer );
+			cout << "Buffer Releases" << endl;
         }
         else
         {
 			cout << "Failed to retrieve buffer" << endl;
             // Retrieve buffer failure
             cout << " " << lResult.GetCodeString().GetAscii() << endl;
-			continue;
         }
     }
 
-    PvGetChar(); // Flush key buffer for next stop.
+//    PvGetChar(); // Flush key buffer for next stop.
     cout << endl << endl;
 
     // Tell the device to stop sending images.

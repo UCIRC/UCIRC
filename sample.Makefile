@@ -20,8 +20,8 @@ PV_LIBRARY_PATH      =$(PUREGEV_ROOT)/lib
 CFLAGS              += -I$(PUREGEV_ROOT)/include -I.
 CPPFLAGS            += -I$(PUREGEV_ROOT)/include -I. 
 ifdef _DEBUG
-    CFLAGS    += -g -D_DEBUG -fsanitize=address
-    CPPFLAGS  += -g -D_DEBUG -fsanitize=address
+    CFLAGS    += -g -D_DEBUG
+    CPPFLAGS  += -g -D_DEBUG
 else
     CFLAGS    += -O3
     CPPFLAGS  += -O3
@@ -131,4 +131,5 @@ qrc_%.cxx: %.qrc
 $(EXEC): $(OBJS)
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS) 
 
-.PHONY: all clean
+.PHONY: all clean Parameters
+
