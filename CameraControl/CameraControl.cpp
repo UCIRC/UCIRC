@@ -2,6 +2,7 @@
 #include "lib/stream.h"
 #include "lib/ImageAcquisition.h"
 #include "lib/ConfigurationReader.h"
+#include "lib/Configuration.h"
 #include <stdlib.h>
 #include <PvSystem.h>
 #include <PvDevice.h>
@@ -15,11 +16,7 @@
 #include <PvSystemEnums.h>
 #include <PvSampleUtils.h>
 
-#define BUFFER_COUNT ( 1 )
-#define MAC_ADDRESS   ( "00:11:1c:02:cd:77" )
-
-
-
+#define BUFFER_COUNT( 10 )
 
 void clean_up( const PvDeviceInfo *lCameraInfo,
 			   PvDevice *lCamera,
@@ -27,22 +24,53 @@ void clean_up( const PvDeviceInfo *lCameraInfo,
 PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream );
 
 
-int main(){
+int main( int aCount, const char **aArgs ){
+	
+	//Creates a configuration Instance
+	Configuration lConfig;
+	//Checks Command line for none default arguments
+	lConfig.ParseCommandLine( aCount, aArgs );
+
 	PvSystem lSystem;
+
+	//PvDeviceInfo object for tracking and sotring device qualities
 	const PvDeviceInfo *lCameraInfo;
-	const PvString MAC = PvString( MAC_ADDRESS );
+
+	//PvString That stores the MAC address to be used
+	const PvString MAC = PvString( lConfig.GetMAC().c_str() );
+	//PvString That stores the IP address to be used
+	const PvString IP  = PvString( lConfig.GetIP().c_str() );
+
+	//Inits pointers of objects to be used later
 	PvResult lResult;
 	PvDevice *lCamera  = NULL;
 	PvStream *lStream = NULL;
 	PvPipeline *lPipeline = NULL;
-
-	//Check if Device can be connected to
-	lResult = lSystem.FindDevice( MAC, &lCameraInfo );
-	if( !lResult.IsOK() ){ cout << "Could not find device at " << MAC.GetAscii() << endl; return -1; }
-
+	bool useMAC = true; 
 	
+	//Check if Device can be connected to via MAC
+	lResult = lSystem.FindDevice( MAC, &lCameraInfo );
+	if( !lResult.IsOK() )
+	{ 
+		cout << "Could not find device at " << MAC.GetAscii() << endl
+		//specify that MAC is not useable as a connection point
+		useMAC = false;
+		//Check is IP is useable
+		cout << "Attempting to find by IP " <<endl;
+		lResult = lSystem.FindDevice( IP, &lCameraInfo );
+		if( !lResult.IsOK() )
+		{
+			cout << "Could not find device at " << IP.GetAscii() << endl;
+			//There is no connection point. Terminate the porgram
+			cout << "Terminating Program" << endl; 
+			clean_up(lCameraInfo, lCamera, lStream);
+			return -1;
+		}
+	}
+
 	//Connect to Camera
-	lCamera = connect( MAC );
+	if( useMAC ) { lCamera = connect( MAC ); }
+	else { lCamera = connect( IP ); }
 	if( lCamera != NULL )
 	{
 		lStream = open_stream( lCameraInfo );

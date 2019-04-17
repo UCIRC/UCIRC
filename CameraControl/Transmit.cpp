@@ -1,3 +1,6 @@
+/*FILE SLATED FOR DELETION, PROBABLY USELESS*/
+
+
 #include <PvSampleUtils.h>
 #include <PvTransmitterGEV.h>
 #include <PvVirtualDeviceGEV.h>

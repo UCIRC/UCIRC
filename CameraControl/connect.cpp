@@ -10,15 +10,14 @@
 #include <stdlib.h>
 
 //Returns pointer to PvDevice Object
-PvDevice *connect( const PvString MAC ){
+PvDevice *connect( const PvString connection_point ){
 	PvResult lResult;
-	//Find Device via MAC
-	cout << "Connecting to Device by MAC" << endl;
-	cout << MAC.GetAscii() << endl;
+	//Find Device via connection_point
+	cout << "Connecting to Device at: " << connection_point.GetAscii()  << endl;
     PvDevice *lCamera;
 	cout << "Creating Device" << endl;
     //Creat Device Object For camera, Connect to it
-	lCamera = PvDevice::CreateAndConnect( MAC, &lResult );
+	lCamera = PvDevice::CreateAndConnect( connection_point, &lResult );
  	cout << "Created Device" << endl;
 	//Check if successful
 	if( !lResult.IsOK() || lCamera==NULL || !lCamera->IsConnected() )

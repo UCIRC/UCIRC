@@ -24,13 +24,11 @@ Reason this file exists:
 //PV_INIT_SIGNAL_HANDLER();
 
 //FileName of the Config File
-#define FILE_NAME ( "CameraConfig.pvxml" )
+#define FILE_NAME ( "lib/CameraConfig.pvxml" )
 
 #define DEVICE_CONFIGURATION_TAG ( "DeviceConfiguration" )
 #define STREAM_CONFIGURAITON_TAG ( "StreamConfiguration" )
 #define STRING_INFORMATION_TAG ( "StringInformation" )
-
-#define TEST_STRING ( "This is a test string" )
 
 //  Does so with some sort of ConnectionID
 //  ->IP
@@ -71,9 +69,6 @@ bool StoreConfiguration( const PvString &aConnectionID )
     // Store with a PvStream
     lWriter.Store( lStream, STREAM_CONFIGURAITON_TAG );
 
-    // Store with a simple string.
-    cout << "Store string information" << endl;
-    lWriter.Store( TEST_STRING, STRING_INFORMATION_TAG );
 
     // Insert the path of your file here.
     cout << "Store string information" << endl;
