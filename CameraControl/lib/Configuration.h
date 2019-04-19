@@ -12,28 +12,29 @@ This file contains the following:
 This file contains code from Pleora's provided sample libraries
 */
 
-#include <PvSampleUtils.h>
+#include <PvSampleTransmitterConfig.h>
 #include <cstring>
 
 //Not sure what these are, or if needed
 #define DEFAULT_WIDTH ( 0 )
 #define DEFAULT_HEIGHT ( 0 )
 //Default MAC address to connect to
-#define DEFAULT_MAC ( "00:11:1c:03:4d:5e" )
+#define DEFAULT_MAC ( "00:11:1c:03:09:12" )
 //Not important at the moment
 #define DEFAULT_IP ( "BLAH" )
 //Default number of images taken by one execution
 #define DEFAULT_IMAGECOUNT ( 6 )
 //Default Location of Image Data Storage
 #define DEFAULT_IMAGEPATH ( "Data/" )
+#define DEFAULT_BUFFERCOUNT ( 10 )
 
-using namespace std;
+//using namespace std;
 
 //template <class T>
 //inline bool ParseOptionFlag( int aCount, const char **Args, 
 //inline bool ParseOption( int aCount, const char **aArgs, const char *aOption, T &aValue );
 
-class Configuration 
+class Configuration : public PvSampleTransmitterConfig
 {
 public:
 
@@ -44,6 +45,7 @@ public:
 		, mIP( DEFAULT_IP )
 		, mImageCount( DEFAULT_IMAGECOUNT )
 		, mImagePath( DEFAULT_IMAGEPATH )
+		, mBufferCount( DEFAULT_BUFFERCOUNT )
     {
     }
 
@@ -57,6 +59,7 @@ public:
 	string GetIP() const { return mIP; }
 	uint32_t GetImageCount() const { return mImageCount; }
 	string GetImagePath() const { return mImagePath; }
+	uint32_t GetBufferCount() const { return mBufferCount; }
 
     void ParseCommandLine( int aCount, const char **aArgs )
     {
@@ -70,16 +73,17 @@ public:
 
         ParseOption<uint32_t>( aCount, aArgs, "--width", mWidth );
         ParseOption<uint32_t>( aCount, aArgs, "--height", mHeight );
-        ParseOption<const string>( aCount, aArgs, "--MAC", mMAC );
-		ParseOption<const string>( aCount, aArgs, "--IP", mIP);
+        ParseOption<string>( aCount, aArgs, "--MAC", mMAC );
+		ParseOption<string>( aCount, aArgs, "--IP", mIP);
 		ParseOption<uint32_t>( aCount, aArgs, "--imagecount", mImageCount );
-		ParseOption<const string>(aCount, aArgs, "--imagepath", mImagePath );
+		ParseOption<string>(aCount, aArgs, "--imagepath", mImagePath );
+		ParseOption<uint32_t>(aCount, aArgs, "--buffercount", mBufferCount );
     }
 
     void PrintHelp()
     {
-        cout << "This program captures images using a code set of variables." << endl 
-		cout << "These variables can be set by using the following tags as comandline arguments." 
+        cout << "This program captures images using a code set of variables." << endl; 
+		cout << "These variables can be set by using the following tags as comandline arguments." << endl; 
 		cout << "Otherwise they remain the default values." << endl << endl;
 
         cout << "--width=<width in pixels>" << endl;
@@ -99,6 +103,9 @@ public:
    	
 		cout << "--imagepath=<Desired image path>" << endl;
 		cout << "Default: " << DEFAULT_IMAGEPATH << endl;
+
+		cout << "--buffercount=<Desired Buffer Count>" <<endl;
+		cout << "Default: " << DEFAULT_BUFFERCOUNT << endl;
 	 }
 
 private:
@@ -109,6 +116,7 @@ private:
 	string mIP;
 	uint32_t mImageCount;
 	string mImagePath;
+	uint32_t mBufferCount;
 
 };
 

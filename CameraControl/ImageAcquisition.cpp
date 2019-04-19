@@ -10,12 +10,13 @@
 #include <PvBufferWriter.h>
 #include <stdlib.h>
 #include <string>
+#include "lib/Configuration.h"
 PV_INIT_SIGNAL_HANDLER();
 
 #define BUFFER_COUNT ( 10 )
 
 
-void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline, uint32_t ImageCount )
+void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline, Configuration *aConfig )
 {
 	// Get device parameters need to control streaming
 	PvGenParameterArray *lDeviceParams = aDevice->GetParameters();
@@ -34,9 +35,9 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
     cout << "Stream Enabled" << endl;
 	lStart->Execute();
 	cout << "Start Executed" << endl;
-
-
-    for(int i=0; i<ImageCount; i++)
+	
+	uint32_t ImageCount = aConfig->GetImageCount();
+    for(uint32_t i=0; i<ImageCount; i++)
     {
         PvBuffer *lBuffer = NULL;
 		PvResult lResult;
@@ -74,7 +75,7 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 						//Potential Issue: Continuing through the loop might cause unwanted affects(?)
 						continue;
 					}
-					PvRawData *lRawData = lBuffer->GetRawData();
+				//	PvRawData *lRawData = lBuffer->GetRawData();
 
 				}
 				else
@@ -85,8 +86,8 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 
 				//Get The Timestamp of the Data
 				uint64_t time = lBuffer->GetTimestamp();
-				
-				string file = "";
+				string dir = aConfig->GetImagePath();	
+				string file = dir;
 				std::ostringstream o;
 				o << time;
 				file += o.str();
@@ -94,7 +95,7 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 				uint32_t *BytesWritten = NULL;
 				PvBufferFormatType Format = PvBufferFormatBMP;
 				PvBufferWriter lWriter;
-				lResult = lWriter.Store(lBuffer, Filename);
+				lResult = lWriter.Store(lBuffer, Filename, Format, BytesWritten );
 				if( !lResult.IsOK() )
 				{
 					cout << "Failed to Save Image" << endl;

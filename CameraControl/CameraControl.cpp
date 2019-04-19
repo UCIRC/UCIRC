@@ -2,7 +2,7 @@
 #include "lib/stream.h"
 #include "lib/ImageAcquisition.h"
 #include "lib/ConfigurationReader.h"
-#include "lib/Configuration.h"
+//#include "lib/Configuration.h"
 #include <stdlib.h>
 #include <PvSystem.h>
 #include <PvDevice.h>
@@ -16,12 +16,12 @@
 #include <PvSystemEnums.h>
 #include <PvSampleUtils.h>
 
-#define BUFFER_COUNT( 10 )
+//#define BUFFER_COUNT ( 10 )
 
 void clean_up( const PvDeviceInfo *lCameraInfo,
 			   PvDevice *lCamera,
 			   PvStream *lStream);
-PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream );
+PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream, uint32_t aBufferCount );
 
 
 int main( int aCount, const char **aArgs ){
@@ -46,15 +46,13 @@ int main( int aCount, const char **aArgs ){
 	PvDevice *lCamera  = NULL;
 	PvStream *lStream = NULL;
 	PvPipeline *lPipeline = NULL;
-	bool useMAC = true; 
 	
 	//Check if Device can be connected to via MAC
+	cout << "Attempting to connect to device at: " << MAC.GetAscii() << endl;
 	lResult = lSystem.FindDevice( MAC, &lCameraInfo );
 	if( !lResult.IsOK() )
 	{ 
-		cout << "Could not find device at " << MAC.GetAscii() << endl
-		//specify that MAC is not useable as a connection point
-		useMAC = false;
+		cout << "Could not find device at " << MAC.GetAscii() << endl;
 		//Check is IP is useable
 		cout << "Attempting to find by IP " <<endl;
 		lResult = lSystem.FindDevice( IP, &lCameraInfo );
@@ -66,21 +64,32 @@ int main( int aCount, const char **aArgs ){
 			clean_up(lCameraInfo, lCamera, lStream);
 			return -1;
 		}
+		
+		else
+		{
+			lCamera = connect( IP );
+		}
+	}
+	
+	else
+	{	
+		//Connect to Camera via MAC
+		lCamera = connect( MAC );
 	}
 
-	//Connect to Camera
-	if( useMAC ) { lCamera = connect( MAC ); }
-	else { lCamera = connect( IP ); }
 	if( lCamera != NULL )
 	{
+		//Open Up Stream
 		lStream = open_stream( lCameraInfo );
 		if( lStream != NULL )
 		{	 
+			//Configure The stream
+			uint32_t lBufferCount = lConfig.GetBufferCount();
 			ConfigureStream( lCamera, lStream );
-			lPipeline = CreatePipeline( lCamera, lStream );
+			lPipeline = CreatePipeline( lCamera, lStream, lBufferCount );
 			if( lPipeline != NULL )
 			{
-				AcquireImages( lCamera, lStream, lPipeline );
+				AcquireImages( lCamera, lStream, lPipeline, &lConfig );
 				delete lPipeline;
 			}
 		}
@@ -119,7 +128,7 @@ void clean_up( const PvDeviceInfo *lCameraInfo,
 	return; 
 }
 
-PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream )
+PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream, uint32_t aBufferCount )
 {
     // Create the PvPipeline object
     PvPipeline* lPipeline = new PvPipeline( aStream );
@@ -130,7 +139,7 @@ PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream )
         uint32_t lSize = aDevice->GetPayloadSize();
 
         // Set the Buffer count and the Buffer size
-        lPipeline->SetBufferCount( BUFFER_COUNT );
+        lPipeline->SetBufferCount( aBufferCount );
         lPipeline->SetBufferSize( lSize );
     }
 
