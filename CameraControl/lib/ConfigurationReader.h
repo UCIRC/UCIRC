@@ -3,10 +3,10 @@
 #include <PvStream.h>
 
 
-bool StoreConfiguartion( const PvString &aConnectionID );
+bool StoreConfiguartion( PvDevice *aDevice, PvStream *aStream, bool camera = true );
 
-PvDevice *RestoreDevice();
+PvDevice *RestoreDevice( bool camera = true );
 
-PvStream *RestoreStream();
+PvStream *RestoreStream( bool camera = true );
 
 

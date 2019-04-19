@@ -68,7 +68,7 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 				//	PvBuffer *lRawBuffer;
 				//	PvBufferConverter lConverter;
 				//	lResult = lConverter.Convert( lBuffer, lRawBuffer );
-					lResult = lBuffer->Reset(PvPayloadTypeRawData);
+			/*		lResult = lBuffer->Reset(PvPayloadTypeRawData);
 					if( !lResult.IsOK() )
 					{
 						cout << "Failed to Reset Buffer" << endl;
@@ -76,7 +76,7 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 						continue;
 					}
 				//	PvRawData *lRawData = lBuffer->GetRawData();
-
+*/
 				}
 				else
 				{
@@ -85,13 +85,15 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 				}
 
 				//Get The Timestamp of the Data
-				uint64_t time = lBuffer->GetTimestamp();
+			//	uint64_t time = lBuffer->GetTimestamp();
+				uint64_t time = i;
 				string dir = aConfig->GetImagePath();	
 				string file = dir;
 				std::ostringstream o;
 				o << time;
 				file += o.str();
 				const PvString Filename =  PvString(file.c_str());
+				cout << "Image FileName: " << Filename.GetAscii() << endl; 
 				uint32_t *BytesWritten = NULL;
 				PvBufferFormatType Format = PvBufferFormatBMP;
 				PvBufferWriter lWriter;
@@ -110,7 +112,7 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 			cout << "Realeasing Buffer" << endl;
             // Release the buffer back to the pipeline
             aPipeline->ReleaseBuffer( lBuffer );
-			cout << "Buffer Releases" << endl;
+			cout << "Buffer Released" << endl;
         }
         else
         {

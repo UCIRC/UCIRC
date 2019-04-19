@@ -24,7 +24,8 @@ Reason this file exists:
 //PV_INIT_SIGNAL_HANDLER();
 
 //FileName of the Config File
-#define FILE_NAME ( "lib/CameraConfig.pvxml" )
+#define FILE_1 ( "lib/CameraConfig1.pvxml" )
+#define FILE_2 ( "lib/CameraConfig2.pvxml" )
 
 #define DEVICE_CONFIGURATION_TAG ( "DeviceConfiguration" )
 #define STREAM_CONFIGURAITON_TAG ( "StreamConfiguration" )
@@ -36,48 +37,23 @@ Reason this file exists:
 //  ->etc.
 //  Returns a boolean to indicate Success/Failure
 
-bool StoreConfiguration( const PvString &aConnectionID )
+//bool camera controls which config file to save the device information to
+//True is for the first camera, false for the second
+void StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 {
-    PvResult lResult;
     PvConfigurationWriter lWriter;
 
-    // Connect to the GigE Vision or USB3 Vision device
-    cout << "Connecting to device" << endl;
-    PvDevice *lDevice = PvDevice::CreateAndConnect( aConnectionID, &lResult );
-    if ( !lResult.IsOK() )
-    {
-        cout << "Unable to connect to device" << endl;
-        PvDevice::Free( lDevice );
-        return false;
-    }
-
-    // Store  with a PvDevice.
-    cout << "Store device configuration" << endl;
-    lWriter.Store( lDevice, DEVICE_CONFIGURATION_TAG );
-
-    // Create and open PvStream
-    cout << "Store stream configuration" << endl;
-    PvStream *lStream = PvStream::CreateAndOpen( aConnectionID, &lResult );
-    if ( !lResult.IsOK() )
-    {
-        cout << "Unable to open stream object from device" << endl;
-        lDevice->Disconnect();
-        PvDevice::Free( lDevice );
-        return false;
-    }
-
+	//Store with a PvDevice
+	lWriter.Store( lDevice, DEVICE_CONFIGURATION_TAG );
     // Store with a PvStream
     lWriter.Store( lStream, STREAM_CONFIGURAITON_TAG );
-
-
-    // Insert the path of your file here.
     cout << "Store string information" << endl;
-    lWriter.Save( FILE_NAME );
-
-    PvStream::Free( lStream );
-    PvDevice::Free( lDevice );
-
-    return true;
+    if( camera ){
+		lWriter.Save( FILE_1 );
+	}
+	else {
+		lWriter.Save( FILE_2 );
+	}
 }
 
 /*
@@ -88,13 +64,18 @@ Uses the Congiration file defined above to:
 ->Returns NULL pointer in case of failure
 */
 
-PvDevice *RestoreDevice()
+PvDevice *RestoreDevice( bool camera )
 {
     PvConfigurationReader lReader;
     
     // Load all the information into a reader.
     cout << "Load information and configuration" << endl;
-    lReader.Load( FILE_NAME );
+  	if( camera ){
+		lReader.Load( FILE_1 );
+	}
+	else {
+		lReader.Load( FILE_2 ); 
+	}
 
     PvDeviceGEV lDeviceGEV;
     PvDevice *lDevice = NULL;
@@ -132,13 +113,19 @@ Uses the Congiration file defined above to:
 ->Returns NULL pointer in case of failure
 */
 
-PvStream *RestoreStream()
+PvStream *RestoreStream( bool camera )
 {
     PvConfigurationReader lReader;
     
     // Load all the information into a reader.
     cout << "Load information and configuration" << endl;
-    lReader.Load( FILE_NAME );
+    
+  	if( camera ){
+		lReader.Load( FILE_1 );
+	}
+	else {
+		lReader.Load( FILE_2 ); 
+	}
     
     PvStreamGEV lStreamGEV;
     PvStream *lStream = NULL;
