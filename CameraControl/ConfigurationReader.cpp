@@ -44,9 +44,9 @@ void StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
     PvConfigurationWriter lWriter;
 
 	//Store with a PvDevice
-	lWriter.Store( lDevice, DEVICE_CONFIGURATION_TAG );
+	lWriter.Store( aDevice, DEVICE_CONFIGURATION_TAG );
     // Store with a PvStream
-    lWriter.Store( lStream, STREAM_CONFIGURAITON_TAG );
+    lWriter.Store( aStream, STREAM_CONFIGURAITON_TAG );
     cout << "Store string information" << endl;
     if( camera ){
 		lWriter.Save( FILE_1 );

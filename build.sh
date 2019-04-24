@@ -1,5 +1,6 @@
 SAMPLES=" \
   CameraControl \
+  Config		\
 "
 
 for SAMPLE in $SAMPLES; do

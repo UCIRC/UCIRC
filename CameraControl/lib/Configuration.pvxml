@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<puregevpersistencefile version="1.0">
+  <propertylist name="GeneralParams" version="1.0">
+    <parameter name="BufferCount">10</parameter>
+    <parameter name="ImagePath">Data</parameter>
+    <parameter name="ImageCount"/>
+  </propertylist>
+</puregevpersistencefile>
