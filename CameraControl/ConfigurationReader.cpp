@@ -24,7 +24,7 @@ Reason this file exists:
 //PV_INIT_SIGNAL_HANDLER();
 
 //FileName of the Config File
-#define CONFIG_FILE ( "lib/Confifuration.pvxml" )
+#define CONFIG_FILE ( "lib/Configuration.pvxml" )
 #define CAMERA1_CONFIGURATION_TAG ( "Camera1" )
 #define STREAM1_CONFIGURAITON_TAG ( "Stream1" )
 #define CAMERA2_CONFIGURATION_TAG ( "Camera2" )
@@ -53,7 +53,7 @@ int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 		string stream_string = "Stream1";
 		target_device = PvString( device_string.c_str() );
 		target_stream = PvString( stream_string.c_str() );
-		cout << "Saving Device and Stream to Camera1 and Stream2 properties" << endl;
+		cout << "Saving Device and Stream to Camera1 and Stream1 properties" << endl;
 	}
 
 	else {
@@ -68,12 +68,12 @@ int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 	lResult = lWriter.Store( aDevice, target_device );
 	if ( !lResult.IsOK() ){
 		cout << "Failed to store Device configuration" << endl;
-		return 0;
+//		return 0;
 	}
     // Store with a PvStream
     lResult = lWriter.Store( aStream, target_stream );
 	if ( !lResult.IsOK() ){
-		cout << "Failed to store Steam configuration" << endl;
+		cout << "Failed to store Stream configuration" << endl;
 		return 0;
 	}
 	
@@ -162,28 +162,32 @@ int RestoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
     return 1;
 }
 
-PvPropertyList *GetGeneralParams(){
+int RestoreGeneralParams( PvPropertyList *aList ){
     string param_string = GENERAL_CONFIGURATION_TAG;
+	cout << "Looking for General Parameters at " << param_string.c_str() << endl;
     const PvString ParamList = PvString( param_string.c_str() );
+	cout << "PvString: " << ParamList.GetAscii() << endl;
     PvConfigurationReader lReader;
 	PvResult lResult;
-	PvPropertyList *lList;
+	PvPropertyList lList;
 
 	lResult = lReader.Load( CONFIG_FILE );
 	if ( !lResult.IsOK() ){
 		cout << "Could not open Configuration file" << endl;
-		return NULL;
+		return -1;
 	}
-		
-	lResult = lReader.Restore( ParamList, lList );
+	cout << "Config FIle Loaded" << endl;
+	
+	lResult = lReader.Restore( ParamList, &lList );
     //If It cannot find the property it creates a new one and writes the defualts
-    if ( lResult.GetCodeString() == "NOT_FOUND" )
+    if ( !lResult.IsOK() ) // lResult.GetCodeString() == "NOT_FOUND" )
     {
-		cout << "Could not property list" << endl;
-		return NULL;
+		cout << "Could not find property list" << endl;
+		return -1;
 
 	}
+	cout << "Config list restored" << endl;
 
-	return lList;
+	return 0;
 	
 }

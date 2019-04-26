@@ -23,42 +23,88 @@ PvDevice *ConnectToDevice( const PvString &aConnectionID );
 PvStream *OpenStream( const PvString &aConnectionID ); 
 int BackupConnection ( PvDevice *aDevice, PvStream *aStream );  
 
-int main(){
+int main(void){
 	
-	PvSystem lSystem;
+//	PvSystem lSystem;
 	PvResult lResult;
-	PvDevice *lCamera  = NULL;
+	PvDevice *lCamera = NULL;
 	PvStream *lStream = NULL;
-	PvPipeline *lPipeline = NULL;
+	PvPipeline *lPipeline;
 	
 	if ( RestoreConfiguration( lCamera, lStream ) != 1 )
 	{
-		//Stand in bit of code
-		if ( BackupConnection( lCamera, lStream ) != 1 )
-		{
-			cout << "Critical Connection Failure" << endl;
-			clean_up( lCamera, lStream );
-			return -1;
+		
+
+		PvString lConnectionID;
+    	if ( PvSelectDevice( &lConnectionID ) )
+    	{
+        	lCamera = ConnectToDevice( lConnectionID );
+        	if ( lCamera != NULL )
+        	{
+            	lStream = OpenStream( lConnectionID );
+            	if ( lStream != NULL )
+				{
+					cout << "Seccusful Connection" << endl;
+				}
+			
+				else 
+				{
+					cout << "Crit Connection Failure" << endl;
+					clean_up( lCamera, lStream );
+					return -1;	
+				}	
+			}
+			else
+			{
+				cout << "Crit Connection Failure" << endl;
+				clean_up( lCamera, lStream );
+				return -1;	
+			}
 		}
-	}
+//			return -1;
+		//Stand in bit of code
+//		if ( BackupConnection( lCamera, lStream ) != 1 )
+//	{
+//			cout << "Critical Connection Failure" << endl;
+//			clean_up( lCamera, lStream );
+//			return -1;
+//		}
+/*		
+		else 
+		{
+			StoreConfiguration( lCamera, lStream );
+			cout << "New Configuration Stored" << endl; 	
+		}
+*/	}
+
+	if ( lCamera == NULL ) { cout << "Camera is Null " << endl; clean_up( lCamera, lStream ); return -1; }
+	if ( lStream == NULL ) { cout << "Stream is NUll " << endl; clean_up( lCamera, lStream ); return -1; }
+	if ( !lCamera->IsConnected() ) { cout << "Failed to Connect to device" << endl; clean_up( lCamera, lStream); return -1; }  
+	if ( !lStream->IsOpen() ) { cout << "Failed to open stream" << endl; clean_up( lCamera, lStream); return -1; }  
 	
-	PvPropertyList *GeneralParams;
-	GeneralParams = GetGeneralParams();
-	if( GeneralParams != NULL )
+	PvPropertyList *GeneralParams = NULL;
+	cout << "Param List Declared" << endl;
+	if( RestoreGeneralParams( GeneralParams ) != 0)
 	{
+		cout << "General Params Loaded" << endl;
 		PvProperty *pBufferCount;
 		pBufferCount = GeneralParams->GetProperty( "BufferCount" ); 
 		int64_t lBufferCount;
 		pBufferCount->GetValue( lBufferCount );
+		cout << "Buffer Count: " << lBufferCount << endl;
+		cout << "Configuring Stream" << endl;
 		ConfigureStream( lCamera, lStream );
+		cout << "Stream Configured" << endl;
+		cout << "Creating Pipeline ... " << endl;
 		lPipeline = CreatePipeline( lCamera, lStream, lBufferCount );
+		cout << "Pipeline Created" << endl;
 		if( lPipeline != NULL )
 		{
 			AcquireImages( lCamera, lStream, lPipeline, GeneralParams );
 			delete lPipeline;
 		}	
 
-	}	
+	}
 	cout << "Cleaning up..." << endl;
 	clean_up( lCamera, lStream);
 	cout << "Terminating program" << endl;	

@@ -3,9 +3,9 @@
 #include <PvStream.h>
 #include <PvPropertyList.h>
 
-int StoreConfiguartion( PvDevice *aDevice, PvStream *aStream, bool camera = true );
+int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera = true );
 
 
 int RestoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera = true );
 
-PvPropertyList *GetGeneralParams();
+int RestoreGeneralParams( PvPropertyList *aList );
