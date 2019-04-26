@@ -10,13 +10,14 @@
 #include <PvBufferWriter.h>
 #include <stdlib.h>
 #include <string>
-#include "lib/Configuration.h"
+#include <PvPropertyList.h>
+//#include "lib/Configuration.h"
 PV_INIT_SIGNAL_HANDLER();
 
 #define BUFFER_COUNT ( 10 )
 
 
-void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline, Configuration *aConfig )
+void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline, PvPropertyList *GeneralParams )
 {
 	// Get device parameters need to control streaming
 	PvGenParameterArray *lDeviceParams = aDevice->GetParameters();
@@ -36,8 +37,13 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 	lStart->Execute();
 	cout << "Start Executed" << endl;
 	
-	uint32_t ImageCount = aConfig->GetImageCount();
-    for(uint32_t i=0; i<ImageCount; i++)
+	//p for "property"
+	PvProperty *pImageCount;
+	pImageCount = GeneralParams->GetProperty( "ImageCount" );
+	int64_t ImageCount;
+	pImageCount->GetValue( ImageCount );
+
+    for(int64_t i=0; i<ImageCount; i++)
     {
         PvBuffer *lBuffer = NULL;
 		PvResult lResult;
@@ -87,7 +93,9 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 				//Get The Timestamp of the Data
 			//	uint64_t time = lBuffer->GetTimestamp();
 				uint64_t time = i;
-				string dir = aConfig->GetImagePath();	
+				PvProperty *pImagePath;
+				pImagePath = GeneralParams->GetProperty( "ImagePath" );
+				string dir = pImagePath->GetValue().GetAscii();	
 				string file = dir;
 				std::ostringstream o;
 				o << time;

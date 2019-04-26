@@ -1,7 +1,7 @@
 #include <PvStream.h>
 #include <PvDevice.h>
 
-PvStream *open_stream( const PvDeviceInfo *lCameraInfo );
+PvStream *open_stream( const PvString *lCameraInfo );
 
 int close_stream( PvStream *lStream );
 

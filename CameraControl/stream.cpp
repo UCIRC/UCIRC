@@ -4,8 +4,9 @@
 #include <PvResult.h>
 #include <PvDeviceGEV.h>
 #include <PvStreamGEV.h>
+#include <PvString.h>
 
-PvStream *open_stream ( const PvDeviceInfo *lCameraInfo ){
+PvStream *open_stream ( const PvString lCameraInfo ){
 	cout << "Opening Stream to Device" << endl;
 
 	PvResult lResult;
@@ -50,4 +51,3 @@ void ConfigureStream( PvDevice *aDevice, PvStream *aStream )
         lDeviceGEV->SetStreamDestination( lStreamGEV->GetLocalIPAddress(), lStreamGEV->GetLocalPort() );
     }
 }
-

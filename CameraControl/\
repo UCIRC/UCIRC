@@ -18,16 +18,15 @@ Reason this file exists:
 #include <PvConfigurationWriter.h>
 #include <PvConfigurationReader.h>
 #include <PvResult.h>
-#include <PvPropertyList.h>
-#include <cstring>
+
 
 //PV_INIT_SIGNAL_HANDLER();
 
 //FileName of the Config File
 #define CONFIG_FILE ( "lib/Confifuration.pvxml" )
 #define CAMERA1_CONFIGURATION_TAG ( "Camera1" )
-#define STREAM1_CONFIGURAITON_TAG ( "Stream1" )
 #define CAMERA2_CONFIGURATION_TAG ( "Camera2" )
+#define STREAM1_CONFIGURAITON_TAG ( "Stream1" )
 #define STREAM2_CONFIGURATION_TAG ( "Stream2" )
 #define GENERAL_CONFIGURATION_TAG ( "GeneralParams" )
 
@@ -44,23 +43,17 @@ int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 {
     PvConfigurationWriter lWriter;
 	PvResult lResult;
-	PvString target_device;
-	PvString target_stream;
+	const PvString target_device;
+	const PvString target_stream;
 	if ( camera ){
-		string device_string = CAMERA1_CONFIGURATION_TAG;
-		//For some reason it says the macro is outta scope
-		//********BUG****************
-		string stream_string = "Stream1";
-		target_device = PvString( device_string.c_str() );
-		target_stream = PvString( stream_string.c_str() );
+		target_device = CAMERA1_CONFIGURATION_TAG;
+		target_stream = STREAM1_CONFIGURATION_TAG;
 		cout << "Saving Device and Stream to Camera1 and Stream2 properties" << endl;
 	}
 
 	else {
-		string device_string = CAMERA2_CONFIGURATION_TAG;
-		string stream_string = STREAM2_CONFIGURATION_TAG;
-		target_device = PvString( device_string.c_str() );
-		target_stream = PvString( stream_string.c_str() );
+		target_device = CAMERA2_CONFIGURATION_TAG;
+		target_stream = STREAM2_CONFIGURATION_TAG;
 		cout << "Saving Device and Stream to Camera2 and Stream2 properties" << endl;
 	}
 
@@ -98,21 +91,18 @@ int RestoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 {
 	PvResult lResult;
     PvConfigurationReader lReader;
- 	PvString target_device;
-	PvString target_stream;
+ 
+	const PvString target_device;
+	const PvString target_stream;
 	if ( camera ){
-		string device_string = CAMERA1_CONFIGURATION_TAG;
-		string stream_string = "Stream1";
-		target_device = PvString( device_string.c_str() );
-		target_stream = PvString( stream_string.c_str() );
+		target_device = CAMERA1_CONFIGURATION_TAG;
+		target_stream = STREAM1_CONFIGURATION_TAG;
 		cout << "Restoring Device from Camera1 and Stream1 properties" << endl;
 	}
 
 	else {
-		string device_string = CAMERA2_CONFIGURATION_TAG;
-		string stream_string = STREAM2_CONFIGURATION_TAG;
-		const PvString target_device = PvString( device_string.c_str() );
-		const PvString target_stream = PvString( stream_string.c_str() );
+		target_device = CAMERA2_CONFIGURATION_TAG;
+		target_stream = STREAM2_CONFIGURATION_TAG;
 		cout << "Restoring Device from Camera2 and Stream2 properties" << endl;
 	}
     
@@ -120,12 +110,12 @@ int RestoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 	lResult = lReader.Load( CONFIG_FILE );
 	if ( !lResult.IsOK() ){
 		cout << "Could not open Config File" << endl;
-		return 0;		
+		
 	}
 
 	cout << "Restoring Device..." << endl;
     // Attempt restoring as a GEV device
-    lResult = lReader.Restore( target_device, aDevice );
+    PvResult lResult = lReader.Restore( target_device, aDevice );
     if ( !lResult.IsOK() )
     {
         cout << "Failed to restore device" << endl; 
@@ -133,7 +123,7 @@ int RestoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
     }
 
     cout << "Verify operation success..." << endl;
-    if ( !aDevice->IsConnected() )
+    if ( !lDevice->IsConnected() )
     {
 		cout << "Failed to connect to Device" << endl;
         return 0;
@@ -143,7 +133,7 @@ int RestoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 
 	cout << "Restoring Stream..." << endl;
 	
-    lResult = lReader.Restore( target_stream , aStream );
+    PvResult lResult = lReader.Restore( target_stream , aStream );
     if ( !lResult.IsOK() )
     {
         cout << "Failed to Restore Stream" << endl;
@@ -151,7 +141,7 @@ int RestoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
     }
 
     cout << "Verify operation success" << endl;
-    if ( !aStream->IsOpen() )
+    if ( !lStream->IsOpen() )
     {
     	cout << "Failed to open Stream" << endl;
 	    return 0;
@@ -162,28 +152,4 @@ int RestoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
     return 1;
 }
 
-PvPropertyList *GetGeneralParams(){
-    string param_string = GENERAL_CONFIGURATION_TAG;
-    const PvString ParamList = PvString( param_string.c_str() );
-    PvConfigurationReader lReader;
-	PvResult lResult;
-	PvPropertyList *lList;
 
-	lResult = lReader.Load( CONFIG_FILE );
-	if ( !lResult.IsOK() ){
-		cout << "Could not open Configuration file" << endl;
-		return NULL;
-	}
-		
-	lResult = lReader.Restore( ParamList, lList );
-    //If It cannot find the property it creates a new one and writes the defualts
-    if ( lResult.GetCodeString() == "NOT_FOUND" )
-    {
-		cout << "Could not property list" << endl;
-		return NULL;
-
-	}
-
-	return lList;
-	
-}

@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #define CONFIG_FILE ( "../CameraControl/lib/Configuration.pvxml" )
+#define GENERAL_CONFIGURATION_TAG ( "GeneralParams" )
 #define DEFAULT_BUFFERCOUNT ( 10 )
 #define DEFAULT_IMAGECOUNT ( 6 )
 #define DEFAULT_IMAGEPATH ( "Data" )
@@ -25,7 +26,7 @@ int main( int aCount, const char **aArgs ){
 	}
 
 	//String Indicating wear the param list is stored
-	string param_string = "GeneralParams";
+	string param_string = GENERAL_CONFIGURATION_TAG;
 	const PvString ParamList = PvString( param_string.c_str() );
 	PvConfigurationReader lReader;
 	PvConfigurationWriter lWriter;
