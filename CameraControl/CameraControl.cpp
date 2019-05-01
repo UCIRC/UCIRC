@@ -1,40 +1,32 @@
-#include "lib/connect.h"
-#include "lib/stream.h"
-#include "lib/ImageAcquisition.h"
-#include "lib/ConfigurationReader.h"
-//#include "lib/Configuration.h"
-#include <stdlib.h>
-#include <PvSystem.h>
-#include <PvDevice.h>
-#include <PvDeviceGEV.h>
-#include <PvStream.h>
-#include <PvStreamGEV.h>
-#include <PvPipeline.h>
-#include <PvBuffer.h>
-#include <PvSystemEnums.h>
-#include <PvSampleUtils.h>
-
-
-#define CONFIG_FILE ( "lib/Configuration.pvxml" )
-
-void clean_up( PvDevice *lCamera, PvStream *lStream);
-PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream, int64_t aBufferCount );
-PvDevice *ConnectToDevice( const PvString &aConnectionID );
-PvStream *OpenStream( const PvString &aConnectionID ); 
-int BackupConnection ( PvDevice *aDevice, PvStream *aStream );  
+#include "lib/CameraControl.h"
 
 int main(void){
 	
-//	PvSystem lSystem;
 	PvResult lResult;
 	PvDevice *lCamera = NULL;
 	PvStream *lStream = NULL;
 	PvPipeline *lPipeline;
-	
-	if ( RestoreConfiguration( lCamera, lStream ) != 1 )
-	{
-		
+	bool Connected = false;
 
+	//Test Case we should Check: Attempting to restore when no device is connected
+	//Restore Device from .pvxml
+	lCamera = RestoreDevice();	
+	if ( lCamera != NULL )
+	{
+		lStream = RestoreStream();
+	
+		if ( lStream != NULL )
+		{
+			cout << "Device and Stream Restored from Configuration File" << endl;
+			//If Connection succesful, set Connected to true
+			Connected = true;
+		}
+	}
+
+	//If Not connected, intiate backup protocol
+	if ( !Connected )
+	{
+		cout << "Configuration Restoration Failure, attempting Backup protocol" << endl;
 		PvString lConnectionID;
     	if ( PvSelectDevice( &lConnectionID ) )
     	{
@@ -44,38 +36,28 @@ int main(void){
             	lStream = OpenStream( lConnectionID );
             	if ( lStream != NULL )
 				{
+					//If Backup Succesful, Set Connected to true and Store the New Configuration
 					cout << "Seccusful Connection" << endl;
+					Connected = true;
+					if ( StoreConfiguration( lCamera, lStream ) == 0 )
+					{
+						cout << "Stored New Configuration" << endl;
+					}
+					else
+					{
+						cout << "Issue Storing New Connection" << endl; 
+					}
 				}
-			
-				else 
-				{
-					cout << "Crit Connection Failure" << endl;
-					clean_up( lCamera, lStream );
-					return -1;	
-				}	
-			}
-			else
-			{
-				cout << "Crit Connection Failure" << endl;
-				clean_up( lCamera, lStream );
-				return -1;	
 			}
 		}
-//			return -1;
-		//Stand in bit of code
-//		if ( BackupConnection( lCamera, lStream ) != 1 )
-//	{
-//			cout << "Critical Connection Failure" << endl;
-//			clean_up( lCamera, lStream );
-//			return -1;
-//		}
-/*		
-		else 
-		{
-			StoreConfiguration( lCamera, lStream );
-			cout << "New Configuration Stored" << endl; 	
-		}
-*/	}
+	}
+
+	if ( !Connected )
+	{
+		cout << "Critical Connection Failure" << endl;
+		clean_up( lCamera, lStream );
+		return -1;
+	}
 
 	if ( lCamera == NULL ) { cout << "Camera is Null " << endl; clean_up( lCamera, lStream ); return -1; }
 	if ( lStream == NULL ) { cout << "Stream is NUll " << endl; clean_up( lCamera, lStream ); return -1; }
@@ -84,11 +66,12 @@ int main(void){
 	
 	PvPropertyList *GeneralParams = NULL;
 	cout << "Param List Declared" << endl;
-	if( RestoreGeneralParams( GeneralParams ) != 0)
+	GeneralParams = RestoreGeneralParams();
+	if( GeneralParams != NULL)
 	{
 		cout << "General Params Loaded" << endl;
 		PvProperty *pBufferCount;
-		pBufferCount = GeneralParams->GetProperty( "BufferCount" ); 
+		pBufferCount = GeneralParams->GetProperty( PvString( "BufferCount" ) ); 
 		int64_t lBufferCount;
 		pBufferCount->GetValue( lBufferCount );
 		cout << "Buffer Count: " << lBufferCount << endl;
@@ -102,6 +85,11 @@ int main(void){
 		{
 			AcquireImages( lCamera, lStream, lPipeline, GeneralParams );
 			delete lPipeline;
+		}
+	
+		else
+		{
+			cout << "Failed to Create Pipeline" << endl;
 		}	
 
 	}

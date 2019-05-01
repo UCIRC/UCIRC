@@ -1,10 +1,4 @@
 #include "lib/stream.h"
-#include <PvStream.h>
-#include <PvSampleUtils.h>
-#include <PvResult.h>
-#include <PvDeviceGEV.h>
-#include <PvStreamGEV.h>
-#include <PvString.h>
 
 PvStream *open_stream ( const PvString lCameraInfo ){
 	cout << "Opening Stream to Device" << endl;

@@ -1,13 +1,4 @@
-#include <PvSampleUtils.h>
-#include <PvDevice.h>
-#include <PvSystem.h>
-#include <PvDeviceGEV.h>
-#include <PvDeviceU3V.h>
-#include <PvDeviceInfo.h>
-#include <PvDeviceInfoGEV.h>
-#include <PvDevice.h>
-#include <PvResult.h>
-#include <stdlib.h>
+#include "lib/connect.h"
 
 //Returns pointer to PvDevice Object
 PvDevice *connect( const PvString connection_point ){

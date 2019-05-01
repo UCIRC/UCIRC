@@ -1,20 +1,6 @@
-#include <PvSampleUtils.h>
-#include <PvDevice.h>
-#include <PvDeviceGEV.h>
-#include <PvDeviceU3V.h>
-#include <PvStream.h>
-#include <PvStreamGEV.h>
-#include <PvStreamU3V.h>
-#include <PvPipeline.h>
-#include <PvBuffer.h>
-#include <PvBufferWriter.h>
-#include <stdlib.h>
-#include <string>
-#include <PvPropertyList.h>
-//#include "lib/Configuration.h"
-PV_INIT_SIGNAL_HANDLER();
+#include "lib/ImageAcquisition.h"
 
-#define BUFFER_COUNT ( 10 )
+PV_INIT_SIGNAL_HANDLER();
 
 
 void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline, PvPropertyList *GeneralParams )
