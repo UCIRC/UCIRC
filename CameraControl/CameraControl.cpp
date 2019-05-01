@@ -28,7 +28,7 @@ int main(void){
 	{
 		cout << "Configuration Restoration Failure, attempting Backup protocol" << endl;
 		PvString lConnectionID;
-    	if ( PvSelectDevice( &lConnectionID ) )
+    	if ( BackupConnection( &lConnectionID ) == 0 )
     	{
         	lCamera = ConnectToDevice( lConnectionID );
         	if ( lCamera != NULL )

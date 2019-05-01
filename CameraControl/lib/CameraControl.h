@@ -24,11 +24,11 @@
 #include "stream.h"
 #include "ImageAcquisition.h"
 #include "ConfigurationReader.h"
+#include "BackupConnection.h"
 
 void clean_up( PvDevice *lCamera, PvStream *lStream);
 PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream, int64_t aBufferCount );
 PvDevice *ConnectToDevice( const PvString &aConnectionID );
 PvStream *OpenStream( const PvString &aConnectionID );
-int BackupConnection ( PvDevice *aDevice, PvStream *aStream );
 
 #endif
