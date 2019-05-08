@@ -7,7 +7,7 @@
 #include <cstring>
 #include <stdlib.h>
 
-#define CONFIG_FILE ( "../CameraControl/lib/Configuration.pvxml" )
+#define CONFIG_FILE ( "../CameraControl/lib/Configuration.pvcfg" )
 #define GENERAL_CONFIGURATION_TAG ( "GeneralParams" )
 #define DEFAULT_BUFFERCOUNT ( 10 )
 #define DEFAULT_IMAGECOUNT ( 6 )

@@ -3,6 +3,7 @@ ConfigurationReader
 File meant for: 
 ->Storing the Configuration of a device
 ->Loading Devices and Streams from a Configuration File
+->Loading General Parameters
 Reason this file exists:
 ->Redundancy
 -->Insures ultiple paths of device connection
@@ -12,15 +13,7 @@ Reason this file exists:
 
 #include "lib/ConfigurationReader.h"
 
-//  Does so with some sort of ConnectionID
-//  ->IP
-//	->MAV
-//  ->etc.
-//  Returns a boolean to indicate Success/Failure
 
-//bool camera controls which config file to save the device information to
-//True is for the first camera, false for the second
-//Returns 0 if succesful, -1 if fails to store config
 int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 {
     PvConfigurationWriter lWriter;
@@ -177,25 +170,43 @@ PvPropertyList *RestoreGeneralParams(){
 	cout << "PvString: " << ParamList.GetAscii() << endl;
     PvConfigurationReader lReader;
 	PvResult lResult;
-	PvPropertyList *lList;
+	PvPropertyList lList;
 
 	lResult = lReader.Load( CONFIG_FILE );
 	if ( !lResult.IsOK() ){
 		cout << "Could not open Configuration file" << endl;
 		return NULL;
 	}
-	cout << "Config FIle Loaded" << endl;
 	
-	lResult = lReader.Restore( ParamList, lList );
+	else if ( lResult.GetCodeString() == "CANNOT_OPEN_FILE" )
+	{
+		cout << "Could not open Configuration file" << endl;
+		return NULL;
+	}
+
+	cout << "Config File Loaded" << endl;
+	
+	uint32_t index = lReader.GetPropertyListCount();
+	
+	lResult = lReader.Restore( ParamList  , &lList );
+
+	cout << "PropertyList Restored" << endl;
     //If It cannot find the property it creates a new one and writes the defualts
-    if ( !lResult.IsOK() ) // lResult.GetCodeString() == "NOT_FOUND" )
+    if ( lResult.GetCodeString().GetAscii()  == "NOT_FOUND" )
     {
 		cout << "Could not find property list" << endl;
 		return NULL;
 
 	}
+
+	else if ( !lResult.IsOK() )
+	{
+		cout << "Could not load property list" << endl;
+		return NULL;
+	}
+
 	cout << "Config list restored" << endl;
 
-	return lList;
+	return &lList;
 	
 }

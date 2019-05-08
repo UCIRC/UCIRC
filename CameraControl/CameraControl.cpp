@@ -5,7 +5,7 @@ int main(void){
 	PvResult lResult;
 	PvDevice *lCamera = NULL;
 	PvStream *lStream = NULL;
-	PvPipeline *lPipeline;
+	PvPipeline *lPipeline = NULL;
 	bool Connected = false;
 
 	//Test Case we should Check: Attempting to restore when no device is connected
@@ -59,11 +59,6 @@ int main(void){
 		return -1;
 	}
 
-	if ( lCamera == NULL ) { cout << "Camera is Null " << endl; clean_up( lCamera, lStream ); return -1; }
-	if ( lStream == NULL ) { cout << "Stream is NUll " << endl; clean_up( lCamera, lStream ); return -1; }
-	if ( !lCamera->IsConnected() ) { cout << "Failed to Connect to device" << endl; clean_up( lCamera, lStream); return -1; }  
-	if ( !lStream->IsOpen() ) { cout << "Failed to open stream" << endl; clean_up( lCamera, lStream); return -1; }  
-	
 	PvPropertyList *GeneralParams = NULL;
 	cout << "Param List Declared" << endl;
 	GeneralParams = RestoreGeneralParams();

@@ -24,7 +24,8 @@
 
  
 //FileName of the Config File 
-#define CONFIG_FILE ( "lib/Configuration.pvxml" ) 
+#define CONFIG_FILE ( "lib/Configuration.pvxml" )
+#define PARAM_FILE  ( "lib/Configuration.pvcfg" ) 
 #define CAMERA1_CONFIGURATION_TAG ( "Camera1" ) 
 #define STREAM1_CONFIGURAITON_TAG ( "Stream1" ) 
 #define CAMERA2_CONFIGURATION_TAG ( "Camera2" ) 

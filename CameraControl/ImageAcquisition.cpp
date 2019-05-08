@@ -44,12 +44,13 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
             {
                 PvPayloadType lType;
                 lType = lBuffer->GetPayloadType();
-				PvRawData *lRawData;
+	//			PvRawData *lRawData;
 
 				//Check if Payload Type is RawData
                 if ( lType == PvPayloadTypeRawData )
 				{
 					//If So, get the data
+					cout << "Image is RawData" << endl;
 					PvRawData *lRawData = lBuffer->GetRawData();
 				}
 
@@ -60,15 +61,15 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 				//	PvBuffer *lRawBuffer;
 				//	PvBufferConverter lConverter;
 				//	lResult = lConverter.Convert( lBuffer, lRawBuffer );
-			/*		lResult = lBuffer->Reset(PvPayloadTypeRawData);
+					lResult = lBuffer->Reset(PvPayloadTypeRawData);
 					if( !lResult.IsOK() )
 					{
 						cout << "Failed to Reset Buffer" << endl;
 						//Potential Issue: Continuing through the loop might cause unwanted affects(?)
 						continue;
 					}
-				//	PvRawData *lRawData = lBuffer->GetRawData();
-*/
+					PvRawData *lRawData = lBuffer->GetRawData();
+
 				}
 				else
 				{
@@ -89,7 +90,7 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 				const PvString Filename =  PvString(file.c_str());
 				cout << "Image FileName: " << Filename.GetAscii() << endl; 
 				uint32_t *BytesWritten = NULL;
-				PvBufferFormatType Format = PvBufferFormatBMP;
+				PvBufferFormatType Format = PvBufferFormatRaw;
 				PvBufferWriter lWriter;
 				lResult = lWriter.Store(lBuffer, Filename, Format, BytesWritten );
 				if( !lResult.IsOK() )
