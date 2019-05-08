@@ -3,19 +3,24 @@
 int main(void){
 	
 	PvResult lResult;
-	PvDevice *lCamera = NULL;
-	PvStream *lStream = NULL;
-	PvPipeline *lPipeline = NULL;
+	PvDevice *lCamera_1 = NULL;
+	PvStream *lStream_1 = NULL;
+	PvDevice *lCamera_2 = NULL;
+	PvStream *lStream_2 = NULL;
+	PvPipeline *lPipeline_1 = NULL;
+	PvPipeline *lPipeline_2 = NULL;
 	bool Connected = false;
 
 	//Test Case we should Check: Attempting to restore when no device is connected
 	//Restore Device from .pvxml
-	lCamera = RestoreDevice();	
-	if ( lCamera != NULL )
+	lCamera_1 = RestoreDevice(true);
+	lCamera_2 = RestoreDevice(false);	
+	if ( lCamera_1 != NULL && lCamera_2 != NULL )
 	{
-		lStream = RestoreStream();
+		lStream_1 = RestoreStream(true);
+		lStream_2 = RestoreStream(false);
 	
-		if ( lStream != NULL )
+		if ( lStream_1 != NULL && lStream_2 != NULL )
 		{
 			cout << "Device and Stream Restored from Configuration File" << endl;
 			//If Connection succesful, set Connected to true
@@ -27,25 +32,37 @@ int main(void){
 	if ( !Connected )
 	{
 		cout << "Configuration Restoration Failure, attempting Backup protocol" << endl;
-		PvString lConnectionID;
-    	if ( BackupConnection( &lConnectionID ) == 0 )
+		PvString lConnectionID_1;
+		PvString lConnectionID_2;
+    	if ( BackupConnection( &lConnectionID_1, NULL, true ) == 0 &&
+			 BackupConnection( &lConnectionID_2, NULL, false) == 0   )
     	{
-        	lCamera = ConnectToDevice( lConnectionID );
-        	if ( lCamera != NULL )
+        	lCamera_1 = ConnectToDevice( lConnectionID_1 );
+			lCamera_2 = ConnectToDevice( lConnectionID_2 );
+        	if ( lCamera_1 != NULL && lCamera_2 != NULL )
         	{
-            	lStream = OpenStream( lConnectionID );
-            	if ( lStream != NULL )
+            	lStream_1 = OpenStream( lConnectionID_1 );
+				lStream_2 = OpenStream( lConnectionID_2 );
+            	if ( lStream_1 != NULL && lStream_2 != NULL )
 				{
 					//If Backup Succesful, Set Connected to true and Store the New Configuration
 					cout << "Seccusful Connection" << endl;
 					Connected = true;
-					if ( StoreConfiguration( lCamera, lStream ) == 0 )
+					if ( StoreConfiguration( lCamera_1, lStream_1 ) == 0 )
 					{
-						cout << "Stored New Configuration" << endl;
+						cout << "Stored First Configuration" << endl;
 					}
 					else
 					{
-						cout << "Issue Storing New Connection" << endl; 
+						cout << "Issue Storing New First Connection" << endl; 
+					}
+					if ( StoreConfiguration( lCamera_2, lStream_2 ) == 0 )
+					{
+						cout << "Stored Second Configuration" << endl;
+					}
+					else
+					{
+						cout << "Issue Storing New Second Configuration" << endl;
 					}
 				}
 			}
@@ -55,7 +72,8 @@ int main(void){
 	if ( !Connected )
 	{
 		cout << "Critical Connection Failure" << endl;
-		clean_up( lCamera, lStream );
+		clean_up( lCamera_1, lStream_1 );
+		clean_up( lCamera_2, lStream_2 );
 		return -1;
 	}
 
@@ -71,25 +89,33 @@ int main(void){
 		pBufferCount->GetValue( lBufferCount );
 		cout << "Buffer Count: " << lBufferCount << endl;
 		cout << "Configuring Stream" << endl;
-		ConfigureStream( lCamera, lStream );
+		ConfigureStream( lCamera_1, lStream_1 );
+		ConfigureStream( lCamera_2, lStream_2 );
 		cout << "Stream Configured" << endl;
 		cout << "Creating Pipeline ... " << endl;
-		lPipeline = CreatePipeline( lCamera, lStream, lBufferCount );
+		lPipeline_1 = CreatePipeline( lCamera_1, lStream_1, lBufferCount );
+		lPipeline_2 = CreatePipeline( lCamera_2, lStream_2, lBufferCount );
 		cout << "Pipeline Created" << endl;
-		if( lPipeline != NULL )
+		if( lPipeline_1 != NULL && lPipeline_2 != NULL )
 		{
-			AcquireImages( lCamera, lStream, lPipeline, GeneralParams );
-			delete lPipeline;
+			AcquireImages( lCamera_1, lStream_1, lPipeline_1, GeneralParams );
+			delete lPipeline_1;
 		}
-	
-		else
+		
+		else { cout << "Failed to create Pipeline" << endl; }
+
+		if( lPipeline_2 != NULL )
 		{
-			cout << "Failed to Create Pipeline" << endl;
-		}	
+			AcquireImages( lCamera_2, lStream_2, lPipeline_2, GeneralParams );
+			delete lPipeline_2;
+		}
+
+		else { cout << "Failed to Create Pipeline" << endl; }	
 
 	}
 	cout << "Cleaning up..." << endl;
-	clean_up( lCamera, lStream);
+	clean_up( lCamera_1, lStream_1 );
+	clean_up( lCamera_2, lStream_2 );
 	cout << "Terminating program" << endl;	
 
 	return 0;
@@ -125,6 +151,7 @@ PvDevice *ConnectToDevice( const PvString &aConnectionID )
     if ( lDevice == NULL )
     {
         cout << "Unable to connect to device." << endl;
+		cout << lResult.GetCodeString().GetAscii() << endl;
     }
 
     return lDevice;
@@ -185,3 +212,4 @@ int BackupConnection( PvDevice *aDevice, PvStream *aStream ){
 
 	return -1;
 }
+

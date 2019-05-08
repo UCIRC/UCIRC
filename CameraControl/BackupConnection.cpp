@@ -6,7 +6,7 @@ int BackupConnection( PvString *aConnectionID, PvDeviceInfoType *aType, bool cam
     const PvDeviceInfo *lSelectedDI = NULL;
     PvSystem lSystem;
 
-
+	lSystem.Find();
     // Detect, select device.
     vector<const PvDeviceInfo *> lDIVector;
     for ( uint32_t i = 0; i < lSystem.GetInterfaceCount(); i++ )
