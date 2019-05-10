@@ -3,8 +3,12 @@
 PV_INIT_SIGNAL_HANDLER();
 
 
-void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline, PvPropertyList *GeneralParams )
+bool AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline, PvPropertyList *GeneralParams )
 {
+	int64_t ImageCount;
+	string Directory;
+	bool result = false;
+
 	// Get device parameters need to control streaming
 	PvGenParameterArray *lDeviceParams = aDevice->GetParameters();
 
@@ -23,11 +27,18 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 	lStart->Execute();
 	cout << "Start Executed" << endl;
 	
-	//p for "property"
-	PvProperty *pImageCount;
-	pImageCount = GeneralParams->GetProperty( "ImageCount" );
-	int64_t ImageCount;
-	pImageCount->GetValue( ImageCount );
+	if( GeneralParams != NULL )
+	{	
+		//p for "property"
+		PvProperty *pImageCount;
+		pImageCount = GeneralParams->GetProperty( "ImageCount" );
+		pImageCount->GetValue( ImageCount );
+	}
+
+	else
+	{
+		ImageCount = 6;
+	}
 
     for(int64_t i=0; i<ImageCount; i++)
     {
@@ -44,28 +55,24 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
             {
                 PvPayloadType lType;
                 lType = lBuffer->GetPayloadType();
-	//			PvRawData *lRawData;
+				PvRawData *lRawData;
 
 				//Check if Payload Type is RawData
                 if ( lType == PvPayloadTypeRawData )
 				{
 					//If So, get the data
 					cout << "Image is RawData" << endl;
-					PvRawData *lRawData = lBuffer->GetRawData();
+					lRawData = lBuffer->GetRawData();
 				}
 
 				else if ( lType == PvPayloadTypeImage )
 				{
 					//If it's an image convert it to RawData
 					cout << "Resetting Buffer Format" << endl;
-				//	PvBuffer *lRawBuffer;
-				//	PvBufferConverter lConverter;
-				//	lResult = lConverter.Convert( lBuffer, lRawBuffer );
 					lResult = lBuffer->Reset(PvPayloadTypeRawData);
 					if( !lResult.IsOK() )
 					{
 						cout << "Failed to Reset Buffer" << endl;
-						//Potential Issue: Continuing through the loop might cause unwanted affects(?)
 						continue;
 					}
 					PvRawData *lRawData = lBuffer->GetRawData();
@@ -78,14 +85,27 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 				}
 
 				//Get The Timestamp of the Data
-			//	uint64_t time = lBuffer->GetTimestamp();
-				uint64_t time = i;
-				PvProperty *pImagePath;
-				pImagePath = GeneralParams->GetProperty( "ImagePath" );
-				string dir = pImagePath->GetValue().GetAscii();	
-				string file = dir;
+
+				char time_buf[21];
+				time_t now;
+				time(&now);
+				strftime(time_buf, 21, "%Y-%m-%dT%H:%M:%SZ", gmtime(&now));
+				
+				if( GeneralParams != NULL)
+				{	
+					PvProperty *pImagePath;
+					pImagePath = GeneralParams->GetProperty( "ImagePath" );
+					Directory = pImagePath->GetValue().GetAscii();	
+				}
+
+				else
+				{
+					Directory = "Data/"; 
+				}
+
+				string file = Directory;
 				std::ostringstream o;
-				o << time;
+				o << time_buf;
 				file += o.str();
 				const PvString Filename =  PvString(file.c_str());
 				cout << "Image FileName: " << Filename.GetAscii() << endl; 
@@ -96,6 +116,11 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 				if( !lResult.IsOK() )
 				{
 					cout << "Failed to Save Image" << endl;
+				}
+				else
+				{
+					cout << "Saved Image" << endl;
+					result = result || true;
 				}
             }
             else
@@ -131,4 +156,7 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
     // Stop the pipeline
     cout << "Stop pipeline" << endl;
     aPipeline->Stop();
+
+	if(!result) cout << "Complete Image Acquisition Failure" << endl;
+	return result;
 }

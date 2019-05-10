@@ -11,7 +11,7 @@
 #define GENERAL_CONFIGURATION_TAG ( "GeneralParams" )
 #define DEFAULT_BUFFERCOUNT ( 10 )
 #define DEFAULT_IMAGECOUNT ( 6 )
-#define DEFAULT_IMAGEPATH ( "Data" )
+#define DEFAULT_IMAGEPATH ( "Data/" )
 
 
 void PrintHelp();

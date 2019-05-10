@@ -10,15 +10,20 @@ int main(void){
 	PvPipeline *lPipeline_1 = NULL;
 	PvPipeline *lPipeline_2 = NULL;
 	bool Connected = false;
+	int64_t lBufferCount;
 
 	//Test Case we should Check: Attempting to restore when no device is connected
 	//Restore Device from .pvxml
 	lCamera_1 = RestoreDevice(true);
-	lCamera_2 = RestoreDevice(false);	
+	if(lCamera_1 != NULL) cout << "Camera One Created" << endl;
+	lCamera_2 = RestoreDevice(false);
+	if(lCamera_2 != NULL) cout << "Camera Two Created" << endl;
 	if ( lCamera_1 != NULL && lCamera_2 != NULL )
 	{
 		lStream_1 = RestoreStream(true);
+		if(lStream_1 != NULL) cout << "Stream One created" << endl;
 		lStream_2 = RestoreStream(false);
+		if(lStream_2 != NULL) cout << "Stream Two Created" << endl;
 	
 		if ( lStream_1 != NULL && lStream_2 != NULL )
 		{
@@ -85,34 +90,51 @@ int main(void){
 		cout << "General Params Loaded" << endl;
 		PvProperty *pBufferCount;
 		pBufferCount = GeneralParams->GetProperty( PvString( "BufferCount" ) ); 
-		int64_t lBufferCount;
 		pBufferCount->GetValue( lBufferCount );
 		cout << "Buffer Count: " << lBufferCount << endl;
-		cout << "Configuring Stream" << endl;
-		ConfigureStream( lCamera_1, lStream_1 );
-		ConfigureStream( lCamera_2, lStream_2 );
-		cout << "Stream Configured" << endl;
-		cout << "Creating Pipeline ... " << endl;
-		lPipeline_1 = CreatePipeline( lCamera_1, lStream_1, lBufferCount );
-		lPipeline_2 = CreatePipeline( lCamera_2, lStream_2, lBufferCount );
-		cout << "Pipeline Created" << endl;
-		if( lPipeline_1 != NULL && lPipeline_2 != NULL )
-		{
-			AcquireImages( lCamera_1, lStream_1, lPipeline_1, GeneralParams );
-			delete lPipeline_1;
-		}
-		
-		else { cout << "Failed to create Pipeline" << endl; }
-
-		if( lPipeline_2 != NULL )
-		{
-			AcquireImages( lCamera_2, lStream_2, lPipeline_2, GeneralParams );
-			delete lPipeline_2;
-		}
-
-		else { cout << "Failed to Create Pipeline" << endl; }	
 
 	}
+
+	else
+	{
+		cout << "Failed to read General Params" << endl;
+		cout << "Using Hardcoded Values" << endl;
+		lBufferCount = 10;
+	}
+
+
+	cout << "Configuring Stream 1..." << endl;
+	ConfigureStream( lCamera_1, lStream_1 );
+	cout << "Configuring Stream 2..." << endl;
+	ConfigureStream( lCamera_2, lStream_2 );
+	cout << "Streams Configured" << endl;
+	
+	cout << "Creating Pipeline 1... " << endl;
+	lPipeline_1 = CreatePipeline( lCamera_1, lStream_1, lBufferCount );
+	if( lPipeline_1 != NULL) cout << "Pipeline 1 Created" << endl;
+	else cout << "Failed to creat Pipeline 1" << endl;
+	cout << "creating Pipeline 2..." << endl;
+	lPipeline_2 = CreatePipeline( lCamera_2, lStream_2, lBufferCount );
+	if( lPipeline_2 != NULL) cout << "Pipeline 2 Created" << endl;
+	else cout << "Failed to creat Pipeline 2" << endl;
+	cout << "Pipelines Created" << endl;
+
+	if( lPipeline_1 != NULL )
+	{
+		cout << "Acquiring Images from Pipeline 1..." << endl;
+		AcquireImages( lCamera_1, lStream_1, lPipeline_1, GeneralParams );
+		//We're done with this pipeline so we delete it from memory
+		delete lPipeline_1;
+	}
+
+	if( lPipeline_2 != NULL )
+	{
+		cout << "Acquiring Images from Pipeline 2..." << endl;
+		AcquireImages( lCamera_2, lStream_2, lPipeline_2, GeneralParams );
+		//We're done with this pipeline so we delete it from memory
+		delete lPipeline_2;
+	}
+
 	cout << "Cleaning up..." << endl;
 	clean_up( lCamera_1, lStream_1 );
 	clean_up( lCamera_2, lStream_2 );
