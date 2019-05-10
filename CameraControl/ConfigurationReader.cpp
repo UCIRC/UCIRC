@@ -73,7 +73,8 @@ PvDevice *RestoreDevice( bool camera )
 	PvResult lResult;
     PvConfigurationReader lReader;
  	PvString target_device;
-	PvDevice *aDevice;
+	PvDeviceGEV aDeviceGEV;
+	PvDevice *aDevice = NULL;
 	
 	if ( camera ){
 		string device_string = CAMERA1_CONFIGURATION_TAG;
@@ -96,12 +97,14 @@ PvDevice *RestoreDevice( bool camera )
 
 	cout << "Restoring Device..." << endl;
     // Attempt restoring as a GEV device
-    lResult = lReader.Restore( target_device, aDevice );
+    lResult = lReader.Restore( target_device, &aDeviceGEV );
     if ( !lResult.IsOK() )
     {
         cout << "Failed to restore device" << endl; 
 		return NULL;
     }
+	
+	aDevice = &aDeviceGEV;
 
     cout << "Verify operation success..." << endl;
     if ( !aDevice->IsConnected() )

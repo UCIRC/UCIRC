@@ -7,6 +7,10 @@ int main(void){
 	PvStream *lStream_1 = NULL;
 	PvDevice *lCamera_2 = NULL;
 	PvStream *lStream_2 = NULL;
+	const PvDeviceInfo *lDeviceInfo_1;
+	const PvDeviceInfo *lDeviceInfo_2;
+	PvString lConnectionID_1;
+	PvString lConnectionID_2;
 	PvPipeline *lPipeline_1 = NULL;
 	PvPipeline *lPipeline_2 = NULL;
 	bool Connected = false;
@@ -37,14 +41,25 @@ int main(void){
 	if ( !Connected )
 	{
 		cout << "Configuration Restoration Failure, attempting Backup protocol" << endl;
-		PvString lConnectionID_1;
-		PvString lConnectionID_2;
-    	if ( BackupConnection( &lConnectionID_1, NULL, true ) == 0 &&
-			 BackupConnection( &lConnectionID_2, NULL, false) == 0   )
+    	if ( BackupConnection( &lDeviceInfo_1, &lDeviceInfo_2 ) == 0 )
     	{
-        	lCamera_1 = ConnectToDevice( lConnectionID_1 );
-			lCamera_2 = ConnectToDevice( lConnectionID_2 );
-        	if ( lCamera_1 != NULL && lCamera_2 != NULL )
+			if( lDeviceInfo_1 != NULL && lDeviceInfo_2 != NULL )
+			{
+				lConnectionID_1 = lDeviceInfo_1->GetConnectionID();
+				cout << "First Device Connection ID: " << lConnectionID_1.GetAscii() << endl;
+				lConnectionID_2 = lDeviceInfo_2->GetConnectionID();
+				cout << "Second Device Connection ID: " << lConnectionID_2.GetAscii() << endl;
+        	
+				lCamera_1 = ConnectToDevice( lConnectionID_1 );
+				lCamera_2 = ConnectToDevice( lConnectionID_2 );
+			}
+
+			else
+			{
+				cout << "Failed to Retrieve Device info" << endl;
+			}		        	
+
+			if ( lCamera_1 != NULL && lCamera_2 != NULL )
         	{
             	lStream_1 = OpenStream( lConnectionID_1 );
 				lStream_2 = OpenStream( lConnectionID_2 );
@@ -53,7 +68,7 @@ int main(void){
 					//If Backup Succesful, Set Connected to true and Store the New Configuration
 					cout << "Seccusful Connection" << endl;
 					Connected = true;
-					if ( StoreConfiguration( lCamera_1, lStream_1 ) == 0 )
+					if ( StoreConfiguration( lCamera_1, lStream_1, true ) == 0 )
 					{
 						cout << "Stored First Configuration" << endl;
 					}
@@ -61,7 +76,7 @@ int main(void){
 					{
 						cout << "Issue Storing New First Connection" << endl; 
 					}
-					if ( StoreConfiguration( lCamera_2, lStream_2 ) == 0 )
+					if ( StoreConfiguration( lCamera_2, lStream_2, false ) == 0 )
 					{
 						cout << "Stored Second Configuration" << endl;
 					}
@@ -190,6 +205,7 @@ PvStream *OpenStream( const PvString &aConnectionID )
     if ( lStream == NULL )
     {
         cout << "Unable to stream from device." << endl;
+		cout << lResult.GetCodeString().GetAscii() << endl;
     }
 
     return lStream;
@@ -214,24 +230,4 @@ PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream, int64_t aBuffe
     return lPipeline;
 }
 
-int BackupConnection( PvDevice *aDevice, PvStream *aStream ){
-	
-	PvString lConnectionID;
-    if ( PvSelectDevice( &lConnectionID ) )
-    {
-        aDevice = ConnectToDevice( lConnectionID );
-        if ( aDevice != NULL )
-        {
-            aStream = OpenStream( lConnectionID );
-            if ( aStream != NULL )
-			{
-				return 1;
-			}
-		}
-		
-		return -1;
-	}
-
-	return -1;
-}
 

@@ -24,6 +24,6 @@
 
 #include <PvDeviceInfo.h>
 
-int BackupConnection( PvString *aConnectionID, PvDeviceInfoType *aType = NULL, bool camera = true );
+int BackupConnection( const PvDeviceInfo **aDeviceInfo_1, const PvDeviceInfo **aDeviceInfo_2 );
 
 #endif

@@ -1,9 +1,10 @@
 #include "lib/BackupConnection.h"
 
-int BackupConnection( PvString *aConnectionID, PvDeviceInfoType *aType, bool camera )
+int BackupConnection( const PvDeviceInfo **aDeviceInfo_1, const PvDeviceInfo **aDeviceInfo_2 )
 {
     PvResult lResult;
-    const PvDeviceInfo *lSelectedDI = NULL;
+	const PvDeviceInfo *lSelectedDI_1 = NULL;
+	const PvDeviceInfo *lSelectedDI_2 = NULL;
     PvSystem lSystem;
 
 	lSystem.Find();
@@ -32,53 +33,34 @@ int BackupConnection( PvString *aConnectionID, PvDeviceInfoType *aType, bool cam
         cout << "No device found!" << endl;
 		return -1;
     }
-
-
-    // Read device selection, optional new IP address.
-    uint32_t lIndex = 0;
 	
-	//Controlling which Camera Gets connected to
-	if ( camera )
+	else if ( lDIVector.size() < 2 )
 	{
-		lIndex = 0;
-		cout << "Getting information for first device..." << endl;
+		cout << "Less than two devices found!" << endl;
+		return -1;
 	}
 
-	else
-	{
-		lIndex = 1;
-		cout << "Getting information for second device..." << endl;
-	}
+
+    uint32_t lIndex_1 = 0;
+	uint32_t lIndex_2 = 1;
+	
     
-    if ( lIndex < lDIVector.size() )
+    lSelectedDI_1 = lDIVector[ lIndex_1 ];
+	lSelectedDI_2 = lDIVector[ lIndex_2 ];
+
+
+    // If the IP  Address of Device 1 valid?
+    if ( lSelectedDI_1->IsConfigurationValid() )
     {
-        // The device is selected
-        lSelectedDI = lDIVector[ lIndex ];
+        *aDeviceInfo_1 = lSelectedDI_1->Copy();
+		if ( lSelectedDI_2->IsConfigurationValid() )
+		{
+			*aDeviceInfo_2 = lSelectedDI_2->Copy();
+			cout << "Device Configurations Valid" << endl;
+			return 0;
+		}
     }
 
-	else
-	{
-		cout << "Failed to detect Requested Device" << endl;
-		return -1;
-	}
-
-
-    // If the IP Address valid?
-    if ( lSelectedDI->IsConfigurationValid() )
-    {
-        *aConnectionID = lSelectedDI->GetConnectionID();
-        if ( aType != NULL )
-        {
-            *aType = lSelectedDI->GetType();
-        }
-
-        return 0;
-    }
-
-	else
-	{
-		cout << "Device Configuratio is Invalid" << endl;
-		return -1;
-	}
-
+	cout << "Device Configurations are Invalid" << endl;
+	return -1;
 }
