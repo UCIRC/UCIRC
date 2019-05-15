@@ -3,10 +3,11 @@
 int main(void){
 	
 	PvResult lResult;
-	PvDevice *lCamera_1 = NULL;
-	PvStream *lStream_1 = NULL;
-	PvDevice *lCamera_2 = NULL;
-	PvStream *lStream_2 = NULL;
+	PvPropertyList *GeneralParams;
+	PvDevice *lCamera_1;
+	PvStream *lStream_1;
+	PvDevice *lCamera_2;
+	PvStream *lStream_2;
 	const PvDeviceInfo *lDeviceInfo_1;
 	const PvDeviceInfo *lDeviceInfo_2;
 	PvString lConnectionID_1;
@@ -16,12 +17,36 @@ int main(void){
 	bool Connected = false;
 	int64_t lBufferCount;
 
+	//Retrive General Parameters
+	cout << "Restoring General Parameters..." << endl;
+	
+	GeneralParams = RestoreGeneralParams();
+	
+	if( GeneralParams != NULL )
+	{
+		cout << "General Params Loaded" << endl;
+		PvProperty *lProperty;
+		lProperty = GeneralParams->GetProperty( PvString( "BufferCount" ) ); 
+		lProperty->GetValue( lBufferCount );
+		cout << "Buffer Count: " << lBufferCount << endl;
+	}
+
+	else
+	{
+		cout << "Failed to read General Params" << endl;
+		cout << "Using Hardcoded Values" << endl;
+		lBufferCount = DEFAULT_BUFFER_COUNT;
+		cout << "Buffer Count: " << lBufferCount << endl;
+	}
+
+
+/*
 	//Test Case we should Check: Attempting to restore when no device is connected
 	//Restore Device from .pvxml
 	lCamera_1 = RestoreDevice(true);
-	if(lCamera_1 != NULL) cout << "Camera One Created" << endl;
+	if(lCamera_1 != NULL) cout << "Camera One Created" << endl << endl;
 	lCamera_2 = RestoreDevice(false);
-	if(lCamera_2 != NULL) cout << "Camera Two Created" << endl;
+	if(lCamera_2 != NULL) cout << "Camera Two Created" << endl << endl;
 	if ( lCamera_1 != NULL && lCamera_2 != NULL )
 	{
 		lStream_1 = RestoreStream(true);
@@ -36,7 +61,7 @@ int main(void){
 			Connected = true;
 		}
 	}
-
+*/
 	//If Not connected, intiate backup protocol
 	if ( !Connected )
 	{
@@ -94,28 +119,10 @@ int main(void){
 		cout << "Critical Connection Failure" << endl;
 		clean_up( lCamera_1, lStream_1 );
 		clean_up( lCamera_2, lStream_2 );
+		delete GeneralParams;
 		return -1;
 	}
 
-	PvPropertyList *GeneralParams = NULL;
-	cout << "Param List Declared" << endl;
-	GeneralParams = RestoreGeneralParams();
-	if( GeneralParams != NULL)
-	{
-		cout << "General Params Loaded" << endl;
-		PvProperty *pBufferCount;
-		pBufferCount = GeneralParams->GetProperty( PvString( "BufferCount" ) ); 
-		pBufferCount->GetValue( lBufferCount );
-		cout << "Buffer Count: " << lBufferCount << endl;
-
-	}
-
-	else
-	{
-		cout << "Failed to read General Params" << endl;
-		cout << "Using Hardcoded Values" << endl;
-		lBufferCount = 10;
-	}
 
 
 	cout << "Configuring Stream 1..." << endl;
@@ -132,12 +139,11 @@ int main(void){
 	lPipeline_2 = CreatePipeline( lCamera_2, lStream_2, lBufferCount );
 	if( lPipeline_2 != NULL) cout << "Pipeline 2 Created" << endl;
 	else cout << "Failed to creat Pipeline 2" << endl;
-	cout << "Pipelines Created" << endl;
 
 	if( lPipeline_1 != NULL )
 	{
 		cout << "Acquiring Images from Pipeline 1..." << endl;
-		AcquireImages( lCamera_1, lStream_1, lPipeline_1, GeneralParams );
+//		AcquireImages( lCamera_1, lStream_1, lPipeline_1, GeneralParams );
 		//We're done with this pipeline so we delete it from memory
 		delete lPipeline_1;
 	}
@@ -145,7 +151,7 @@ int main(void){
 	if( lPipeline_2 != NULL )
 	{
 		cout << "Acquiring Images from Pipeline 2..." << endl;
-		AcquireImages( lCamera_2, lStream_2, lPipeline_2, GeneralParams );
+//		AcquireImages( lCamera_2, lStream_2, lPipeline_2, GeneralParams );
 		//We're done with this pipeline so we delete it from memory
 		delete lPipeline_2;
 	}
@@ -153,29 +159,13 @@ int main(void){
 	cout << "Cleaning up..." << endl;
 	clean_up( lCamera_1, lStream_1 );
 	clean_up( lCamera_2, lStream_2 );
+	delete GeneralParams;
 	cout << "Terminating program" << endl;	
 
 	return 0;
 
 }
 
-void clean_up( PvDevice *lCamera, PvStream *lStream )
-{
-	if( lCamera != NULL )
-	{
-		while( disconnect( lCamera ) != 0 );	
-		cout << "Freeing Camera" << endl;
- 		PvDevice::Free( lCamera ); 
-	}
-	
-	if( lStream != NULL )
-	{
-		while( close_stream( lStream ) != 0 );
-		cout << "Freeing Stream" << endl;
-		PvStream::Free( lStream );
-	}
-	return; 
-}
 
 PvDevice *ConnectToDevice( const PvString &aConnectionID )
 {
@@ -230,4 +220,64 @@ PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream, int64_t aBuffe
     return lPipeline;
 }
 
+void clean_up( PvDevice *lCamera, PvStream *lStream )
+{
+	if( lCamera != NULL )
+	{
+		while( disconnect( lCamera ) != 0 );	
+		cout << "Freeing Camera" << endl;
+ 		PvDevice::Free( lCamera ); 
+	}
+	
+	if( lStream != NULL )
+	{
+		while( close_stream( lStream ) != 0 );
+		cout << "Freeing Stream" << endl;
+		PvStream::Free( lStream );
+	}
+	return; 
+}
+
+int disconnect( PvDevice *lCamera ){
+    PvResult lResult;
+    cout << "Disconnecting from device..." << endl;
+    //Disconnect From Camera
+    lResult = lCamera->Disconnect();
+    //Check if Succesful
+    if( !lResult.IsOK() )
+    {
+        cout << "Could Not Disconnect from device" << endl;
+        return -1;
+    }
+    cout << "Disconnected From Device" << endl;
+    return 0;
+}
+
+int close_stream ( PvStream *lStream ){
+    PvResult lResult;
+    cout << "Closing Stream..." << endl;
+    lResult = lStream->Close();
+    if( !lResult.IsOK() ){
+        cout << "Failed to close the stream" << endl;
+        return -1;
+    }
+    cout << "Closed the stream" << endl;
+    return 0;
+}
+
+void ConfigureStream( PvDevice *aDevice, PvStream *aStream )
+{
+    // If this is a GigE Vision device, configure GigE Vision specific streaming parameters
+    PvDeviceGEV* lDeviceGEV = dynamic_cast<PvDeviceGEV *>( aDevice );
+    if ( lDeviceGEV != NULL )
+    {
+        PvStreamGEV *lStreamGEV = static_cast<PvStreamGEV *>( aStream );
+
+        // Negotiate packet size
+        lDeviceGEV->NegotiatePacketSize();
+
+        // Configure device streaming destination
+        lDeviceGEV->SetStreamDestination( lStreamGEV->GetLocalIPAddress(), lStreamGEV->GetLocalPort() );
+    }
+}
 

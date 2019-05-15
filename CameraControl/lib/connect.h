@@ -1,6 +1,9 @@
 #ifndef INIT
 #define INIT
 
+#include <PvDeviceInfo.h>
+#include <PvStreamGEV.h>
+#include <PvDeviceGEV.h>
 #include <stdlib.h>
 #include <PvString.h>
 #include <PvSystem.h>
@@ -16,18 +19,17 @@
 #include <PvSystemEnums.h>
 #include <PvSampleUtils.h>
 
+
+#define DEFAULT_IMAGE_COUNT ( 6 )
+#define DEFAULT_IMAGE_PATH ( "Data/" )
+#define DEFAULT_BUFFER_COUNT ( 10 )
+
 #endif
 
 
 #ifndef CONNECT_H
 #define CONNECT_H
-
-
-//connect to device via MAC address
-//Args: A MAC Address in the form of a PvString
-//a pointer to a PvDeviceInfo object; empty
-PvDevice *connect( const PvString connection_point );
-//Disconnect from Device
+//I know this is janky but it's fine
 int disconnect( PvDevice *lCamera );
 
 #endif

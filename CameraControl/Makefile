@@ -1,6 +1,4 @@
 SRC_CPPS = \
-           connect.cpp \
-		   stream.cpp \
 		   ImageAcquisition.cpp \
 		   ConfigurationReader.cpp \
 		   CameraControl.cpp \

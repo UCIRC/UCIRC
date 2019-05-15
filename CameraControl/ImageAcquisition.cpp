@@ -9,6 +9,30 @@ bool AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 	string Directory;
 	bool result = false;
 
+	//Raw Image Parameters
+	uint32_t *BytesWritten = NULL;
+	PvBufferFormatType Format = PvBufferFormatRaw;
+	PvBufferWriter lWriter;
+
+	//Check if Param List loaded
+	if( GeneralParams != NULL )
+	{	
+
+		PvProperty *lProperty;
+		//p for "property"
+		lProperty = GeneralParams->GetProperty( "ImageCount" );
+		lProperty->GetValue( ImageCount );
+
+		lProperty = GeneralParams->GetProperty( "ImagePath" );
+		Directory = lProperty->GetValue().GetAscii();
+	}
+
+	else
+	{
+		ImageCount = DEFAULT_IMAGE_COUNT;
+		Directory = DEFAULT_IMAGE_PATH;
+	}
+
 	// Get device parameters need to control streaming
 	PvGenParameterArray *lDeviceParams = aDevice->GetParameters();
 
@@ -27,18 +51,6 @@ bool AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 	lStart->Execute();
 	cout << "Start Executed" << endl;
 	
-	if( GeneralParams != NULL )
-	{	
-		//p for "property"
-		PvProperty *pImageCount;
-		pImageCount = GeneralParams->GetProperty( "ImageCount" );
-		pImageCount->GetValue( ImageCount );
-	}
-
-	else
-	{
-		ImageCount = 6;
-	}
 
     for(int64_t i=0; i<ImageCount; i++)
     {
@@ -55,14 +67,12 @@ bool AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
             {
                 PvPayloadType lType;
                 lType = lBuffer->GetPayloadType();
-				PvRawData *lRawData;
 
 				//Check if Payload Type is RawData
                 if ( lType == PvPayloadTypeRawData )
 				{
 					//If So, get the data
 					cout << "Image is RawData" << endl;
-					lRawData = lBuffer->GetRawData();
 				}
 
 				else if ( lType == PvPayloadTypeImage )
@@ -75,44 +85,31 @@ bool AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 						cout << "Failed to Reset Buffer" << endl;
 						continue;
 					}
-					PvRawData *lRawData = lBuffer->GetRawData();
-
 				}
+
 				else
 				{
 					cout << "Data is neither an Image or Raw Data" << endl;
 					continue;
 				}
 
-				//Get The Timestamp of the Data
-
+				//Set Image Path name
 				char time_buf[21];
 				time_t now;
 				time(&now);
 				strftime(time_buf, 21, "%Y-%m-%dT%H:%M:%SZ", gmtime(&now));
-				
-				if( GeneralParams != NULL)
-				{	
-					PvProperty *pImagePath;
-					pImagePath = GeneralParams->GetProperty( "ImagePath" );
-					Directory = pImagePath->GetValue().GetAscii();	
-				}
-
-				else
-				{
-					Directory = "Data/"; 
-				}
-
 				string file = Directory;
 				std::ostringstream o;
 				o << time_buf;
 				file += o.str();
+				file += ".raw";
+				
+				//Convert to PvString
 				const PvString Filename =  PvString(file.c_str());
 				cout << "Image FileName: " << Filename.GetAscii() << endl; 
-				uint32_t *BytesWritten = NULL;
-				PvBufferFormatType Format = PvBufferFormatRaw;
-				PvBufferWriter lWriter;
+				
 				lResult = lWriter.Store(lBuffer, Filename, Format, BytesWritten );
+				
 				if( !lResult.IsOK() )
 				{
 					cout << "Failed to Save Image" << endl;
@@ -123,12 +120,14 @@ bool AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
 					result = result || true;
 				}
             }
+	
             else
             {
 				cout << "Operational Result Failure" << endl;
                 // Non OK operational result
                 cout  << lOperationResult.GetCodeString().GetAscii() << endl;
             }
+
 			cout << "Realeasing Buffer" << endl;
             // Release the buffer back to the pipeline
             aPipeline->ReleaseBuffer( lBuffer );
@@ -142,8 +141,7 @@ bool AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
         }
     }
 
-//    PvGetChar(); // Flush key buffer for next stop.
-    cout << endl << endl;
+    cout << endl;
 
     // Tell the device to stop sending images.
     cout << "Sending AcquisitionStop command to the device" << endl;
@@ -157,6 +155,6 @@ bool AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline,
     cout << "Stop pipeline" << endl;
     aPipeline->Stop();
 
-	if(!result) cout << "Complete Image Acquisition Failure" << endl;
+	if(!result) cout << "COMPLETE IMAGE ACQUISITION FAILURE" << endl;
 	return result;
 }

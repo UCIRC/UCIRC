@@ -22,9 +22,7 @@ int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 	PvString target_stream;
 	if ( camera ){
 		string device_string = CAMERA1_CONFIGURATION_TAG;
-		//For some reason it says the macro is outta scope
-		//********BUG****************
-		string stream_string = "Stream1";
+		string stream_string = STREAM1_CONFIGURATION_TAG;
 		target_device = PvString( device_string.c_str() );
 		target_stream = PvString( stream_string.c_str() );
 		cout << "Saving Device and Stream to Camera1 and Stream1 properties" << endl;
@@ -73,7 +71,7 @@ PvDevice *RestoreDevice( bool camera )
 	PvResult lResult;
     PvConfigurationReader lReader;
  	PvString target_device;
-	PvDeviceGEV aDeviceGEV;
+	PvDeviceGEV *aDeviceGEV = new PvDeviceGEV;
 	PvDevice *aDevice = NULL;
 	
 	if ( camera ){
@@ -97,14 +95,14 @@ PvDevice *RestoreDevice( bool camera )
 
 	cout << "Restoring Device..." << endl;
     // Attempt restoring as a GEV device
-    lResult = lReader.Restore( target_device, &aDeviceGEV );
+    lResult = lReader.Restore( target_device, aDeviceGEV );
     if ( !lResult.IsOK() )
     {
         cout << "Failed to restore device" << endl; 
 		return NULL;
     }
 	
-	aDevice = &aDeviceGEV;
+	aDevice = aDeviceGEV;
 
     cout << "Verify operation success..." << endl;
     if ( !aDevice->IsConnected() )
@@ -122,6 +120,7 @@ PvDevice *RestoreDevice( bool camera )
 PvStream  *RestoreStream( bool camera )
 {
 	PvResult lResult;
+	PvStreamGEV *aStreamGEV = new PvStreamGEV;
 	PvStream *aStream;
     PvConfigurationReader lReader;
 	PvString target_stream;
@@ -147,12 +146,14 @@ PvStream  *RestoreStream( bool camera )
 
 	cout << "Restoring Stream..." << endl;
 	
-    lResult = lReader.Restore( target_stream , aStream );
+    lResult = lReader.Restore( target_stream , aStreamGEV );
     if ( !lResult.IsOK() )
     {
         cout << "Failed to Restore Stream" << endl;
 		return NULL;
     }
+
+	aStream = aStreamGEV;
 
     cout << "Verify operation success" << endl;
     if ( !aStream->IsOpen() )
@@ -166,50 +167,57 @@ PvStream  *RestoreStream( bool camera )
     return aStream;
 }
 
-PvPropertyList *RestoreGeneralParams(){
+PvPropertyList  *RestoreGeneralParams(){
     string param_string = GENERAL_CONFIGURATION_TAG;
 	cout << "Looking for General Parameters at " << param_string.c_str() << endl;
     const PvString ParamList = PvString( param_string.c_str() );
-	cout << "PvString: " << ParamList.GetAscii() << endl;
-    PvConfigurationReader lReader;
-	PvResult lResult;
-	PvPropertyList lList;
+	//Test for fidelity
+	cout << "PvString:                         " << ParamList.GetAscii() << endl;
+    
 
+	//Forward Declarations
+	PvConfigurationReader lReader;
+	PvResult lResult;
+	PvPropertyList *lList = new PvPropertyList;
+
+	//Check if file can be loaded
 	lResult = lReader.Load( CONFIG_FILE );
-	if ( !lResult.IsOK() ){
+	if ( lResult.GetCodeString() == "CANNOT_OPEN_FILE"  ){
 		cout << "Could not open Configuration file" << endl;
+		cout << lResult.GetCodeString().GetAscii() << endl << endl;
 		return NULL;
 	}
 	
-	else if ( lResult.GetCodeString() == "CANNOT_OPEN_FILE" )
+	else if ( !lResult.IsOK() )
 	{
 		cout << "Could not open Configuration file" << endl;
+		cout << "SOME OTHER REASON" << endl << endl;
 		return NULL;
 	}
 
 	cout << "Config File Loaded" << endl;
 	
 	uint32_t index = lReader.GetPropertyListCount();
-	
-	lResult = lReader.Restore( ParamList  , &lList );
 
-	cout << "PropertyList Restored" << endl;
+	cout << index << " Property List(s)" << endl;
+	
+	lResult = lReader.Restore( ParamList  , lList );
+
     //If It cannot find the property it creates a new one and writes the defualts
     if ( lResult.GetCodeString().GetAscii()  == "NOT_FOUND" )
     {
 		cout << "Could not find property list" << endl;
+		cout << lResult.GetCodeString().GetAscii() << endl << endl;
 		return NULL;
-
 	}
 
 	else if ( !lResult.IsOK() )
 	{
 		cout << "Could not load property list" << endl;
+		cout << lResult.GetCodeString().GetAscii()  << endl << endl;
 		return NULL;
 	}
 
-	cout << "Config list restored" << endl;
-
-	return &lList;
-	
+	cout << "Param list restored!" << endl << endl;
+	return lList;
 }
