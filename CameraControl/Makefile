@@ -3,6 +3,7 @@ SRC_CPPS = \
 		   ConfigurationReader.cpp \
 		   CameraControl.cpp \
 		   BackupConnection.cpp \
+		   Camera.cpp \
 
 EXEC     = CameraControl
 

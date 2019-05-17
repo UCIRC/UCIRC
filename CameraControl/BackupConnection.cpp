@@ -1,10 +1,9 @@
 #include "lib/BackupConnection.h"
 
-int BackupConnection( const PvDeviceInfo **aDeviceInfo_1, const PvDeviceInfo **aDeviceInfo_2 )
+bool BackupConnection( const PvDeviceInfo **aDeviceInfo )
 {
     PvResult lResult;
-	const PvDeviceInfo *lSelectedDI_1 = NULL;
-	const PvDeviceInfo *lSelectedDI_2 = NULL;
+	const PvDeviceInfo *lSelectedDI = NULL;
     PvSystem lSystem;
 
 	lSystem.Find();
@@ -31,36 +30,23 @@ int BackupConnection( const PvDeviceInfo **aDeviceInfo_1, const PvDeviceInfo **a
     if ( lDIVector.size() == 0)
     {
         cout << "No device found!" << endl;
-		return -1;
+		return false;
     }
 	
-	else if ( lDIVector.size() < 2 )
-	{
-		cout << "Less than two devices found!" << endl;
-		return -1;
-	}
-
-
-    uint32_t lIndex_1 = 0;
-	uint32_t lIndex_2 = 1;
+    uint32_t lIndex = 0;
 	
     
-    lSelectedDI_1 = lDIVector[ lIndex_1 ];
-	lSelectedDI_2 = lDIVector[ lIndex_2 ];
+    lSelectedDI = lDIVector[ lIndex ];
 
 
     // If the IP  Address of Device 1 valid?
-    if ( lSelectedDI_1->IsConfigurationValid() )
+    if ( lSelectedDI->IsConfigurationValid() )
     {
-        *aDeviceInfo_1 = lSelectedDI_1->Copy();
-		if ( lSelectedDI_2->IsConfigurationValid() )
-		{
-			*aDeviceInfo_2 = lSelectedDI_2->Copy();
-			cout << "Device Configurations Valid" << endl;
-			return 0;
-		}
+        *aDeviceInfo = lSelectedDI->Copy();
+		cout << "Device Configuration Valid" << endl;
+		return true;
     }
 
-	cout << "Device Configurations are Invalid" << endl;
-	return -1;
+	cout << "Device Configuration is Invalid" << endl;
+	return false;
 }

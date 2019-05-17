@@ -13,8 +13,8 @@
 #define GENERAL_CONFIGURATION_TAG ( "GeneralParams" )
 #define DEFAULT_BUFFERCOUNT ( 10 )
 #define DEFAULT_IMAGECOUNT ( 6 )
-#define DEFAULT_MAC_1 ( "00:11:1c:02:cd:77" )
-#define DEFAULT_MAC_2 ( "00:11:1c:03:09:12" )
+#define DEFAULT_NAME_1 ( "Camera_1" )
+#define DEFAULT_NAME_2 ( "Camera_2" )
 #define DEFAULT_IMAGEPATH ( "Data/" )
 bool Delete();
 
@@ -69,13 +69,13 @@ int main( int aCount, const char **aArgs ){
 		pImagePath.SetValue( PvString( DEFAULT_IMAGEPATH ) );
 		lList.Add( pImagePath );
 
-		PvProperty pMAC_1 = PvProperty( "MAC_1", "" );
-		pMAC_1.SetValue( PvString( DEFAULT_MAC_1 ) );
-		lList.Add( pMAC_1 );
+		PvProperty pName_1 = PvProperty( "Name_1", "" );
+		pName_1.SetValue( PvString( DEFAULT_NAME_1 ) );
+		lList.Add( pName_1 );
 
-		PvProperty pMAC_2 = PvProperty( "MAC_2", "" );
-		pMAC_2.SetValue( PvString( DEFAULT_MAC_2 ) );
-		lList.Add( pMAC_2 );
+		PvProperty pName_2 = PvProperty( "Name_2", "" );
+		pName_2.SetValue( PvString( DEFAULT_NAME_2 ) );
+		lList.Add( pName_2 );
 
 		PvProperty pImageCount = PvProperty( "ImageCount", "" );
 		pImageCount.SetValue( (int64_t) (DEFAULT_IMAGECOUNT) );
@@ -112,13 +112,13 @@ int main( int aCount, const char **aArgs ){
 		pImagePath.SetValue( PvString( DEFAULT_IMAGEPATH ) );
 		lList.Add( pImagePath );
 
-		PvProperty pMAC_1 = PvProperty( "MAC_1", "" );
-		pMAC_1.SetValue( PvString( DEFAULT_MAC_1 ) );
-		lList.Add( pMAC_1 );
+		PvProperty pName_1 = PvProperty( "Name_1", "" );
+		pName_1.SetValue( PvString( DEFAULT_NAME_1 ) );
+		lList.Add( pName_1 );
 
-		PvProperty pMAC_2 = PvProperty( "MAC_2", "" );
-		pMAC_1.SetValue( PvString( DEFAULT_MAC_2 ) );
-		lList.Add( pMAC_2 );
+		PvProperty pName_2 = PvProperty( "Name_2", "" );
+		pName_1.SetValue( PvString( DEFAULT_NAME_2 ) );
+		lList.Add( pName_2 );
 		
 		PvProperty pImageCount = PvProperty( "ImageCount", "" );
 		pImagePath.SetValue( (int64_t) (DEFAULT_IMAGECOUNT) );
@@ -163,13 +163,13 @@ int main( int aCount, const char **aArgs ){
 		pImagePath.SetValue( PvString( DEFAULT_IMAGEPATH ) );
 		lList.Add( pImagePath );
 
-		PvProperty pMAC_1 = PvProperty( "MAC_1", "" );
-		pMAC_1.SetValue( PvString( DEFAULT_MAC_1 ) );
-		lList.Add( pMAC_1 );
+		PvProperty pName_1 = PvProperty( "Name_1", "" );
+		pName_1.SetValue( PvString( DEFAULT_NAME_1 ) );
+		lList.Add( pName_1 );
 
-		PvProperty pMAC_2 = PvProperty( "MAC_2", "" );
-		pMAC_2.SetValue( PvString( DEFAULT_MAC_2 ) );
-		lList.Add( pMAC_2 );
+		PvProperty pName_2 = PvProperty( "Name_2", "" );
+		pName_2.SetValue( PvString( DEFAULT_NAME_2 ) );
+		lList.Add( pName_2 );
 		
 		PvProperty pImageCount = PvProperty( "ImageCount", "" );
 		pImageCount.SetValue( (int64_t) (DEFAULT_IMAGECOUNT) );
@@ -192,8 +192,8 @@ int main( int aCount, const char **aArgs ){
 	{
 		int64_t mImageCount;
 		int64_t mBufferCount;
-		string mMAC_1;
-		string mMAC_2;
+		string mName_1;
+		string mName_2;
 		string mImagePath;
 		PvProperty *lProperty;
 		PvPropertyList lCopy;
@@ -227,32 +227,32 @@ int main( int aCount, const char **aArgs ){
 			lCopy.Add( pImagePath );
 		}
 
-		if ( ParseOption<string>(aCount, aArgs, "--MAC_1", mMAC_1 ) )
+		if ( ParseOption<string>(aCount, aArgs, "--Name_1", mName_1 ) )
 		{
 			change=true;
-			PvProperty pMAC_1 = PvProperty( "MAC_1", "" );
-			pMAC_1.SetValue( PvString( mMAC_1.c_str() ) );
-			lCopy.Add( pMAC_1 );
+			PvProperty pName_1 = PvProperty( "Name_1", "" );
+			pName_1.SetValue( PvString( mName_1.c_str() ) );
+			lCopy.Add( pName_1 );
 		}
 		
 		else
 		{
-			PvProperty pMAC_1 = PvProperty( *lList.GetProperty( "MAC_1" ) );
-			lCopy.Add( pMAC_1 );
+			PvProperty pName_1 = PvProperty( *lList.GetProperty( "Name_1" ) );
+			lCopy.Add( pName_1 );
 		}	
 
-		if ( ParseOption<string>(aCount, aArgs, "--MAC_2", mMAC_2 ) )
+		if ( ParseOption<string>(aCount, aArgs, "--Name_2", mName_2 ) )
 		{
 			change=true;
-			PvProperty pMAC_2 = PvProperty( "MAC_2", "" );
-			pMAC_2.SetValue( PvString( mMAC_2.c_str() ) );
-			lCopy.Add( pMAC_2 );
+			PvProperty pName_2 = PvProperty( "Name_2", "" );
+			pName_2.SetValue( PvString( mName_2.c_str() ) );
+			lCopy.Add( pName_2 );
 		}
 	
 		else
 		{	
-			PvProperty pMAC_2 = PvProperty( *lList.GetProperty ( "MAC_2" ) );
-			lCopy.Add( pMAC_2 );
+			PvProperty pName_2 = PvProperty( *lList.GetProperty ( "Name_2" ) );
+			lCopy.Add( pName_2 );
 		}
 		
 		if ( ParseOption<int64_t>(aCount, aArgs, "--buffercount", mBufferCount ) )
@@ -383,11 +383,11 @@ void PrintHelp()
     cout << "--imagecount=<Desired image count>" << endl;
     cout << "Default: " << DEFAULT_IMAGECOUNT << endl << endl;
 
-	cout << "--MAC_1=<Desired MAC Address>" << endl;
-	cout << "Default: " << DEFAULT_MAC_1 << endl << endl;
+	cout << "--Name_1=<Desired MAC Address>" << endl;
+	cout << "Default: " << DEFAULT_NAME_1 << endl << endl;
 
-	cout << "--MAC_2=<Desired MAC Address>" << endl;
-	cout << "Default: " << DEFAULT_MAC_2 << endl << endl;
+	cout << "--Name_2=<Desired MAC Address>" << endl;
+	cout << "Default: " << DEFAULT_NAME_2 << endl << endl;
 
     cout << "--imagepath=<Desired image path>" << endl;
     cout << "Default: " << DEFAULT_IMAGEPATH << endl << endl;

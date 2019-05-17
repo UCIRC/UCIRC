@@ -3,16 +3,17 @@
 PV_INIT_SIGNAL_HANDLER();
 
 
-bool AcquireImages( PvDevice *aDevice, PvStream *aStream, PvPipeline *aPipeline, PvPropertyList *GeneralParams )
+bool AcquireImages( Camera *aCamera, PvPropertyList *GeneralParams )
 {
 	int64_t ImageCount;
 	string Directory;
 	bool result = false;
-
 	//Raw Image Parameters
 	uint32_t *BytesWritten = NULL;
 	PvBufferFormatType Format = PvBufferFormatRaw;
 	PvBufferWriter lWriter;
+	PvPipeline *aPipeline = aCamera->Pipeline;
+	PvDevice *aDevice = aCamera->Device;
 
 	//Check if Param List loaded
 	if( GeneralParams != NULL )

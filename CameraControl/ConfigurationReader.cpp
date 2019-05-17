@@ -18,22 +18,16 @@ int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 {
     PvConfigurationWriter lWriter;
 	PvResult lResult;
-	PvString target_device;
-	PvString target_stream;
+	string target_file;
+	PvString target_stream = STREAM_CONFIGURATION_TAG;
+	PvString target_device = DEVICE_CONFIGURATION_TAG;
+
 	if ( camera ){
-		string device_string = CAMERA1_CONFIGURATION_TAG;
-		string stream_string = STREAM1_CONFIGURATION_TAG;
-		target_device = PvString( device_string.c_str() );
-		target_stream = PvString( stream_string.c_str() );
-		cout << "Saving Device and Stream to Camera1 and Stream1 properties" << endl;
+		target_file = CAMERA_1_FILE;
 	}
 
 	else {
-		string device_string = CAMERA2_CONFIGURATION_TAG;
-		string stream_string = STREAM2_CONFIGURATION_TAG;
-		target_device = PvString( device_string.c_str() );
-		target_stream = PvString( stream_string.c_str() );
-		cout << "Saving Device and Stream to Camera2 and Stream2 properties" << endl;
+		target_file = CAMERA_2_FILE;
 	}
 
 	//Store with a PvDevice
@@ -42,14 +36,33 @@ int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 		cout << "Failed to store Device configuration" << endl;
 		return -1;
 	}
+
     // Store with a PvStream
     lResult = lWriter.Store( aStream, target_stream );
 	if ( !lResult.IsOK() ){
 		cout << "Failed to store Stream configuration" << endl;
 		return -1;
 	}
+
 	
-	lResult = lWriter.Save( CONFIG_FILE );
+	int counter = 0;
+    bool removed = false;
+    cout << "Remove operation attempt " << counter << endl;
+    while ( remove( target_file.c_str() ) != 0 )
+    {
+        if ( counter > 5 )
+        {
+            cout << "Failed to remove file" << endl;
+            cout << "Saving operation Failed" << endl;
+            return false;
+        }
+        counter ++;
+        cout << "Remove operation attempt " << counter << endl;
+    }
+
+    cout << "Remove Operation Successful" << endl;
+	
+	lResult = lWriter.Save( PvString( target_file.c_str() ) );
 	if ( !lResult.IsOK () ){
 		cout << "Failed to save configuration information to Configuration File" << endl;
 		return -1;
@@ -58,6 +71,8 @@ int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 	return 0;
 	
 }
+
+
 
 /*
 Uses the Congiration file defined above to:
@@ -70,24 +85,21 @@ PvDevice *RestoreDevice( bool camera )
 {
 	PvResult lResult;
     PvConfigurationReader lReader;
- 	PvString target_device;
+ 	PvString target_device = DEVICE_CONFIGURATION_TAG;
 	PvDeviceGEV *aDeviceGEV = new PvDeviceGEV;
 	PvDevice *aDevice = NULL;
+	string target_file;
 	
 	if ( camera ){
-		string device_string = CAMERA1_CONFIGURATION_TAG;
-		target_device = PvString( device_string.c_str() );
-		cout << "Restoring Device from Camera1 properties" << endl;
+		target_file = CAMERA_1_FILE;
 	}
 
 	else {
-		string device_string = CAMERA2_CONFIGURATION_TAG;
-		target_device = PvString( device_string.c_str() );
-		cout << "Restoring Device from Camera2 properties" << endl;
+		target_file = CAMERA_2_FILE;
 	}
     
     cout << "Loading information and configuration" << endl;
-	lResult = lReader.Load( CONFIG_FILE );
+	lResult = lReader.Load( PvString( target_file.c_str() ) );
 	if ( !lResult.IsOK() ){
 		cout << "Could not open Config File" << endl;
 		return NULL;		
@@ -123,22 +135,18 @@ PvStream  *RestoreStream( bool camera )
 	PvStreamGEV *aStreamGEV = new PvStreamGEV;
 	PvStream *aStream;
     PvConfigurationReader lReader;
-	PvString target_stream;
+	string target_file;
+	PvString target_stream = STREAM_CONFIGURATION_TAG;
 	if ( camera ){
-		//FIX THIS BUG
-		string stream_string = "Stream1";
-		target_stream = PvString( stream_string.c_str() );
-		cout << "Restoring Stream Stream1 properties" << endl;
+		target_file = CAMERA_1_FILE;	
 	}
 
 	else {
-		string stream_string = STREAM2_CONFIGURATION_TAG;
-		target_stream = PvString( stream_string.c_str() );
-		cout << "Restoring Device from Camera2 and Stream2 properties" << endl;
+		target_file = CAMERA_2_FILE;	
 	}
     
     cout << "Loading information and configuration" << endl;
-	lResult = lReader.Load( CONFIG_FILE );
+	lResult = lReader.Load( PvString( target_file.c_str() ) );
 	if ( !lResult.IsOK() ){
 		cout << "Could not open Config File" << endl;
 		return NULL;		
