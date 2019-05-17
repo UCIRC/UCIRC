@@ -13,8 +13,8 @@
 #define GENERAL_CONFIGURATION_TAG ( "GeneralParams" )
 #define DEFAULT_BUFFERCOUNT ( 10 )
 #define DEFAULT_IMAGECOUNT ( 6 )
-#define DEFAULT_NAME_1 ( "Camera_1" )
-#define DEFAULT_NAME_2 ( "Camera_2" )
+#define DEFAULT_NAME_1 ( "Camera1" )
+#define DEFAULT_NAME_2 ( "Camera2" )
 #define DEFAULT_IMAGEPATH ( "Data/" )
 bool Delete();
 

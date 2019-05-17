@@ -53,8 +53,7 @@ int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
         if ( counter > 5 )
         {
             cout << "Failed to remove file" << endl;
-            cout << "Saving operation Failed" << endl;
-            return false;
+			break;
         }
         counter ++;
         cout << "Remove operation attempt " << counter << endl;

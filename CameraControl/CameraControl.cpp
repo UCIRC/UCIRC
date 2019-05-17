@@ -41,8 +41,12 @@ int main(void){
 	}
 
 	Camera *Camera_1 = NewCamera( lName_1 );
-
-	AcquireImages( Camera_1, GeneralParams );
+	cout << "Camera Created" << endl;
+	
+	if( SetupCamera( Camera_1, true, lBufferCount ) )
+	{
+		AcquireImages( Camera_1, GeneralParams );
+	}
 
 	cout << "Cleaning up..." << endl;
 	FreeCameraInfo(Camera_1);

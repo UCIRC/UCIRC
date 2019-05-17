@@ -3,8 +3,8 @@
   <propertylist name="GeneralParams" version="1.0">
     <parameter name="BufferCount">10</parameter>
     <parameter name="ImagePath">Data/</parameter>
-    <parameter name="Name_1">Camera_1</parameter>
-    <parameter name="Name_2">Camera_2</parameter>
+    <parameter name="Name_1">Camera1</parameter>
+    <parameter name="Name_2">Camera2</parameter>
     <parameter name="ImageCount">6</parameter>
   </propertylist>
 </puregevpersistencefile>
