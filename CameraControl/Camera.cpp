@@ -15,13 +15,7 @@ void FreeCameraInfo( Camera *aCamera )
 	clean_up( aCamera->Device, aCamera->Stream);
 	aCamera->Device = NULL;
 	aCamera->Stream = NULL;
-	if ( aCamera->DeviceInfo != NULL )
-	{
-		cout << "TTTESS" << endl;
-		delete aCamera->DeviceInfo;
-		cout << "Test" << endl;
-		aCamera->DeviceInfo = NULL;
-	}
+	
 	if ( aCamera->Pipeline != NULL )
 	{
 		delete aCamera->Pipeline;
@@ -80,7 +74,6 @@ bool SetupCamera( Camera *aCamera, bool select, int64_t aBufferCount )
 					Connected = true;
 					cout << "Storing New Configuration" << endl;
 					StoreConfiguration( lDeviceInfo, lDevice, lStream, select );
-					exit(0);
 				}
 			}
 		}
@@ -123,18 +116,6 @@ Switches the order of devices on each consecutive Search
 		FreeCameraInfo( aCamera );
 		return false;
 	}
-/*
-	PvGenParameterArray *test = lDevice->GetCommunicationParameters();
-	PvGenParameter *pt = NULL;
-	for( uint32_t i = 0; i<test->GetCount() ; i++ )
-	{
-		pt = test->Get(i);
-		cout << pt->GetName().GetAscii() << " : " << pt->ToString().GetAscii() << endl;
-	}
-
-	delete test;
-*/		
-
 	
 
 

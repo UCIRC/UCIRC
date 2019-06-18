@@ -3,10 +3,8 @@
 //PV_INIT_SIGNAL_HANDLER();
 
 
-bool AcquireImages( Camera *aCamera, PvPropertyList *GeneralParams )
+bool AcquireImages( Camera *aCamera, string File, int64_t ImageCount )
 {
-	int64_t ImageCount;
-	string Directory;
 	bool result = false;
 	//Raw Image Parameters
 	uint32_t *BytesWritten = NULL;
@@ -15,24 +13,6 @@ bool AcquireImages( Camera *aCamera, PvPropertyList *GeneralParams )
 	PvPipeline *aPipeline = aCamera->Pipeline;
 	PvDevice *aDevice = aCamera->Device;
 
-	//Check if Param List loaded
-	if( GeneralParams != NULL )
-	{	
-
-		PvProperty *lProperty;
-		//p for "property"
-		lProperty = GeneralParams->GetProperty( "ImageCount" );
-		lProperty->GetValue( ImageCount );
-
-		lProperty = GeneralParams->GetProperty( "ImagePath" );
-		Directory = lProperty->GetValue().GetAscii();
-	}
-
-	else
-	{
-		ImageCount = DEFAULT_IMAGE_COUNT;
-		Directory = DEFAULT_IMAGE_PATH;
-	}
 
 	// Get device parameters need to control streaming
 	PvGenParameterArray *lDeviceParams = aDevice->GetParameters();
@@ -94,22 +74,10 @@ bool AcquireImages( Camera *aCamera, PvPropertyList *GeneralParams )
 					continue;
 				}
 
-				//Set Image Path name
-				char time_buf[21];
-				time_t now;
-				time(&now);
-				strftime(time_buf, 21, "%Y-%m-%dT%H:%M:%SZ", gmtime(&now));
-				string file = Directory;
-				std::ostringstream o;
-				o << time_buf;
-				file += aCamera->Name.GetAscii();
-				file += o.str();
-				file += "("+to_string(i)+")";
-				file += ".raw";
-				
-				//Convert to PvString
-				const PvString Filename =  PvString(file.c_str());
-				cout << "Image FileName: " << Filename.GetAscii() << endl; 
+				File += "(" + to_string(i) + ")";
+				File += ".raw";
+	
+				const PvString Filename = PvString( File.c_str() );
 				
 				lResult = lWriter.Store(lBuffer, Filename, Format, BytesWritten );
 				
