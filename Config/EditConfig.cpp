@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define CONFIG_FILE ( "../CameraControl/lib/Configuration.pvxml" )
-#define PARAM_FILE ( "../CameraControl/lib/Configration.pvcfg" )
+#define CONFIG_FILE ( "Configurations/Configuration.pvxml" )
+#define PARAM_FILE ( "Configurations/Configration.pvcfg" )
 #define GENERAL_CONFIGURATION_TAG ( "GeneralParams" )
 #define DEFAULT_BUFFERCOUNT ( 10 )
 #define DEFAULT_IMAGECOUNT ( 6 )

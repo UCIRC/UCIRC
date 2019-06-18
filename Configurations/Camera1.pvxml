@@ -1,5 +1,86 @@
 <?xml version="1.0"?>
 <puregevpersistencefile version="1.0">
+  <context name="ebusplayerconfig">1</context>
+  <propertylist name="communicationbrowser" version="1.0">
+    <parameter name="Visibility">Beginner</parameter>
+    <parameter name="Names">FeatureNames</parameter>
+    <parameter name="View">Tree</parameter>
+    <parameter name="Refresh">AutoRefresh</parameter>
+  </propertylist>
+  <propertylist name="devicebrowser" version="1.0">
+    <parameter name="Visibility">Expert</parameter>
+    <parameter name="Names">FeatureNames</parameter>
+    <parameter name="View">Tree</parameter>
+    <parameter name="Refresh">AutoRefresh</parameter>
+  </propertylist>
+  <propertylist name="streambrowser" version="1.0">
+    <parameter name="Visibility">Beginner</parameter>
+    <parameter name="Names">FeatureNames</parameter>
+    <parameter name="View">Tree</parameter>
+    <parameter name="Refresh">AutoRefresh</parameter>
+  </propertylist>
+  <propertylist name="defaultcommu3vbrowser" version="1.0">
+    <parameter name="Visibility">Beginner</parameter>
+    <parameter name="Names">FeatureNames</parameter>
+    <parameter name="View">Tree</parameter>
+    <parameter name="Refresh">AutoRefresh</parameter>
+  </propertylist>
+  <propertylist name="defaultcommgevbrowser" version="1.0">
+    <parameter name="Visibility">Beginner</parameter>
+    <parameter name="Names">FeatureNames</parameter>
+    <parameter name="View">Tree</parameter>
+    <parameter name="Refresh">AutoRefresh</parameter>
+  </propertylist>
+  <context name="setupversion">1.0.0.0</context>
+  <context name="setuprole">ctrldata</context>
+  <context name="setupdestination">unicastauto</context>
+  <context name="setupunicastspecificport">0</context>
+  <context name="setupdefaultchannel">0</context>
+  <context name="setupunicastip">0.0.0.0</context>
+  <context name="setupunicastport">0</context>
+  <context name="setupmulticastip">239.192.1.1</context>
+  <context name="defaultchannel">1042</context>
+  <context name="filteringdlgversion">1.0.0.0</context>
+  <context name="filterrgbenabled">true</context>
+  <context name="redgain">1</context>
+  <context name="greengain">1</context>
+  <context name="bluegain">1</context>
+  <context name="redoffset">0</context>
+  <context name="greenoffset">0</context>
+  <context name="blueoffset">0</context>
+  <context name="bayerfiltering">simple</context>
+  <context name="histogramversion">1.0.0.0</context>
+  <context name="histogramenabled">false</context>
+  <context name="histogramdarkthreshold">0</context>
+  <context name="histogramlightthreshold">255</context>
+  <context name="saveenabled">0</context>
+  <context name="oneoutof">10</context>
+  <context name="maxrate">100</context>
+  <context name="averagethroughput">1</context>
+  <context name="savethrottleoption">1</context>
+  <context name="savepath">C:\Users\svoynick\Pictures</context>
+  <context name="saveformat">bmp</context>
+  <context name="logbufferversion">1.0.0.0</context>
+  <context name="loggenicamenabled">true</context>
+  <context name="logeventsenabled">false</context>
+  <context name="logbuffererrorenabled">true</context>
+  <context name="logbufferallenabled">false</context>
+  <context name="chunkenabled">false</context>
+  <context name="logfilename">C:\Users\svoynick\Desktop\EventMonitor.txt</context>
+  <context name="logwritetofileenabled">false</context>
+  <context name="logserialcomenabled">false</context>
+  <context name="logsinkenabled">false</context>
+  <context name="bufferoptionsdlgversion">1.0.0.0</context>
+  <context name="streamingbuffercount">16</context>
+  <context name="streamingdefaultbuffersize">4147200</context>
+  <context name="streamingautoresize">1</context>
+  <propertylist name="displayoptions" version="1.0">
+    <parameter name="vsyncenabled">0</parameter>
+    <parameter name="keeppartialimagesenabled">0</parameter>
+    <parameter name="displaychunkdata">0</parameter>
+    <parameter name="targetframerate">30</parameter>
+    <parameter name="deinterlacing">deinterlacingweavinghalf</parameter>
+  </propertylist>
   <device name="Camera" version="1.0">
     <mac>00:11:1c:02:cd:77</mac>
     <accesstype>control</accesstype>
@@ -20,17 +101,17 @@
     <device>
       <parameter name="DeviceScanType">Areascan</parameter>
       <parameter name="DeviceStreamChannelEndianness">Little</parameter>
-      <parameter name="DeviceStreamChannelPacketSize">1476</parameter>
+      <parameter name="DeviceStreamChannelPacketSize">1444</parameter>
       <parameter name="GevHeartbeatTimeout">5000</parameter>
       <parameter name="SensorDigitizationTaps">One</parameter>
       <parameter name="Width">640</parameter>
       <parameter name="Height">480</parameter>
       <parameter name="OffsetX">0</parameter>
       <parameter name="OffsetY">0</parameter>
-      <parameter name="PixelFormat">Mono8</parameter>
-      <parameter name="TestPattern">iPORTTestPattern</parameter>
-      <parameter name="AcquisitionMode">Continuous</parameter>
-      <parameter name="AcquisitionFrameCount">1</parameter>
+      <parameter name="PixelFormat">Mono14</parameter>
+      <parameter name="TestPattern">Off</parameter>
+      <parameter name="AcquisitionMode">MultiFrame</parameter>
+      <parameter name="AcquisitionFrameCount">6</parameter>
       <parameter name="AcquisitionFrameToSkip">0</parameter>
       <parameter name="ActionUnconditionalMode">Off</parameter>
       <parameter name="PixelBusDataValidEnabled">0</parameter>
@@ -51,9 +132,9 @@
       <parameter name="GevMCTT">400</parameter>
       <parameter name="GevMCRC">3</parameter>
       <parameter name="TimestampResetActivation">Disabled</parameter>
-      <parameter name="PlcEquation0"/>
-      <parameter name="PlcEquation1"/>
-      <parameter name="PlcEquation2"/>
+      <parameter name="PlcEquation0">GpioOut0=PlcCtrl0</parameter>
+      <parameter name="PlcEquation1">GpioOut1=PlcCtrl1</parameter>
+      <parameter name="PlcEquation2">GpioOut2=PlcCtrl2</parameter>
       <parameter name="PlcEquation3"/>
       <parameter name="PlcEquation4"/>
       <parameter name="PlcEquation5"/>
@@ -66,7 +147,7 @@
       <parameter name="PlcEquation12"/>
       <parameter name="PlcEquation13"/>
       <parameter name="PlcEquation14"/>
-      <parameter name="PlcCtrlValueAllMask">0</parameter>
+      <parameter name="PlcCtrlValueAllMask">0x7</parameter>
       <parameter name="PlcCtrlValueAll">0</parameter>
       <parameter name="PlcRescalerGranularityFactor">Granularity30ns</parameter>
       <parameter name="PlcRescalerFreqMultiplier">FrequencyX256</parameter>
@@ -77,7 +158,6 @@
       <parameter name="PlcDelayerDelayCount">0</parameter>
       <parameter name="PlcDelayerReferenceTimingSignal">PlcRescalerOut</parameter>
       <parameter name="GrabberPlcTriggerable">0</parameter>
-      <parameter name="AcquisitionPipeBlockCount">Two</parameter>
       <parameter name="ActionGroupMask[ActionSelector:ActionTrig0SetZero]">0</parameter>
       <parameter name="ActionGroupKey[ActionSelector:ActionTrig0SetZero]">0</parameter>
       <parameter name="ActionGroupMask[ActionSelector:ActionTrig0SetOne]">0</parameter>
@@ -109,12 +189,12 @@
       <parameter name="ActionGroupMask[ActionSelector:ActionTrig0PulseTrig1Pulse]">0</parameter>
       <parameter name="ActionGroupKey[ActionSelector:ActionTrig0PulseTrig1Pulse]">0</parameter>
       <parameter name="BulkMode[BulkSelector:Bulk0]">UART</parameter>
-      <parameter name="BulkBaudRate[BulkSelector:Bulk0]">Baud9600</parameter>
+      <parameter name="BulkBaudRate[BulkSelector:Bulk0]">Baud57600</parameter>
       <parameter name="BulkLoopback[BulkSelector:Bulk0]">0</parameter>
       <parameter name="BulkNumOfStopBits[BulkSelector:Bulk0]">One</parameter>
       <parameter name="BulkParity[BulkSelector:Bulk0]">None</parameter>
-      <parameter name="BulkUpstreamFifoWatermark[BulkSelector:Bulk0]">256</parameter>
-      <parameter name="BulkUpstreamRxTimeout[BulkSelector:Bulk0]">2.08332</parameter>
+      <parameter name="BulkUpstreamFifoWatermark[BulkSelector:Bulk0]">2</parameter>
+      <parameter name="BulkUpstreamRxTimeout[BulkSelector:Bulk0]">0.34722</parameter>
       <parameter name="BulkMode[BulkSelector:Bulk1]">UART</parameter>
       <parameter name="BulkBaudRate[BulkSelector:Bulk1]">Baud9600</parameter>
       <parameter name="BulkLoopback[BulkSelector:Bulk1]">0</parameter>
@@ -142,7 +222,7 @@
       <parameter name="CounterIncrementEventActivation[CounterSelector:Counter1]">Off</parameter>
       <parameter name="CounterDecrementEventActivation[CounterSelector:Counter1]">Off</parameter>
       <parameter name="DeviceLinkHeartbeatTimeout[DeviceLinkSelector:1]">5e+06</parameter>
-      <parameter name="EventNotification[EventSelector:Bulk0UpstreamData]">Off</parameter>
+      <parameter name="EventNotification[EventSelector:Bulk0UpstreamData]">On</parameter>
       <parameter name="EventNotification[EventSelector:Bulk1UpstreamData]">Off</parameter>
       <parameter name="EventNotification[EventSelector:Bulk2UpstreamData]">Off</parameter>
       <parameter name="EventNotification[EventSelector:PlcEventQueue0]">Off</parameter>
@@ -151,7 +231,7 @@
       <parameter name="EventNotification[EventSelector:PlcEventQueue3]">Off</parameter>
       <parameter name="GevGVCPExtendedStatusCodes[GevGVCPExtendedStatusCodesSelector:Version1_1]">0</parameter>
       <parameter name="GevSCPSBigEndian[GevStreamChannelSelector:0]">0</parameter>
-      <parameter name="GevSCPSPacketSize[GevStreamChannelSelector:0]">1476</parameter>
+      <parameter name="GevSCPSPacketSize[GevStreamChannelSelector:0]">1444</parameter>
       <parameter name="ChunkModeActive[GevStreamChannelSelector:0]">0</parameter>
       <parameter name="ChunkPixelBusMetadataTotalLengthMax[GevStreamChannelSelector:0]">0</parameter>
       <parameter name="GevSCCFGUnconditionalStreaming[GevStreamChannelSelector:0]">0</parameter>
@@ -202,7 +282,7 @@
       <parameter name="InterPacketTimeout">0</parameter>
       <parameter name="RequestTimeout">1000</parameter>
       <parameter name="PreemptiveResendTimeout">0</parameter>
-      <parameter name="MaximumPendingResends">45</parameter>
+      <parameter name="MaximumPendingResends">512</parameter>
       <parameter name="RequestMissingPackets">1</parameter>
       <parameter name="AutoResetOnLackOfResources">1</parameter>
       <parameter name="MaximumResendRequestRetryByPacket">3</parameter>
@@ -214,7 +294,7 @@
       <parameter name="OnlyStartOnFirstPacket">1</parameter>
       <parameter name="ExtraBlockCompletion">Disabled</parameter>
       <parameter name="TimeoutCountedAsError">0</parameter>
-      <parameter name="AbortCountedAsError">0</parameter>
+      <parameter name="AbortCountedAsError">1</parameter>
       <parameter name="TimestampSourcePreferred">Software</parameter>
     </parameters>
   </stream>

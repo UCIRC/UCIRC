@@ -12,15 +12,30 @@ Reason this file exists:
 */
 
 #include "lib/ConfigurationReader.h"
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <algorithm>
 
+#define VIENTO_FILE ( "Configuration/14BitMonoThrough.pvcfg" )
 
-int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
+int StoreConfiguration( const PvDeviceInfo *aDeviceInfo, PvDevice *aDevice, PvStream *aStream,  bool camera )
 {
-    PvConfigurationWriter lWriter;
-	PvResult lResult;
+	ostringstream xml;
+	ifstream TemplateFile( TEMPLATE_FILE );
+	xml << TemplateFile.rdbuf();
+	string xml_string = xml.str();
+	//String to use as Reaplcement
+	PvString mac = aDeviceInfo->GetUniqueID();
+	string MAC = mac.GetAscii();
+	cout << MAC << endl;
+	//Target string
+	string search = "00:00:00:00:00:00";
+	size_t pntr = 0;
+	size_t pos;
+	string line;
+
 	string target_file;
-	PvString target_stream = STREAM_CONFIGURATION_TAG;
-	PvString target_device = DEVICE_CONFIGURATION_TAG;
 
 	if ( camera ){
 		target_file = CAMERA_1_FILE;
@@ -30,42 +45,28 @@ int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera )
 		target_file = CAMERA_2_FILE;
 	}
 
-	//Store with a PvDevice
-	lResult = lWriter.Store( aDevice, target_device );
-	if ( !lResult.IsOK() ){
-		cout << "Failed to store Device configuration" << endl;
-		return -1;
-	}
+	pos = xml_string.find(search);
+	xml_string.replace(pos, search.length(), MAC);
 
-    // Store with a PvStream
-    lResult = lWriter.Store( aStream, target_stream );
-	if ( !lResult.IsOK() ){
-		cout << "Failed to store Stream configuration" << endl;
-		return -1;
-	}
+	pos = xml_string.find(search);
+	xml_string.replace(pos, search.length(), MAC);
 
+	TemplateFile.close();
 	
 	int counter = 0;
-    bool removed = false;
     cout << "Remove operation attempt " << counter << endl;
     while ( remove( target_file.c_str() ) != 0 )
     {
         if ( counter > 5 )
         {
-            cout << "Failed to remove file" << endl;
 			break;
         }
         counter ++;
-        cout << "Remove operation attempt " << counter << endl;
     }
 
-    cout << "Remove Operation Successful" << endl;
-	
-	lResult = lWriter.Save( PvString( target_file.c_str() ) );
-	if ( !lResult.IsOK () ){
-		cout << "Failed to save configuration information to Configuration File" << endl;
-		return -1;
-	}
+	ofstream out_file(target_file.c_str() );
+	out_file << xml_string;
+
 
 	return 0;
 	

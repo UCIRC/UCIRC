@@ -4,10 +4,11 @@
 #include "Init.h"
  
 //FileName of the Config File 
-#define CONFIG_FILE ( "lib/Configuration.pvxml" )
-#define PARAM_FILE  ( "lib/Configuration.pvcfg" )
-#define CAMERA_1_FILE ( "lib/Camera1.pvxml" )
-#define CAMERA_2_FILE ( "lib/Camera2.pvxml" ) 
+#define CONFIG_FILE ( "Configurations/Configuration.pvxml" )
+#define PARAM_FILE  ( "Configurations/Configuration.pvcfg" )
+#define CAMERA_1_FILE ( "Configurations/Camera1.pvxml" )
+#define CAMERA_2_FILE ( "Configurations/Camera2.pvxml" )
+#define TEMPLATE_FILE ( "Configurations/Template.pvxml" ) 
 #define CAMERA1_CONFIGURATION_TAG ( "Camera1" ) 
 #define STREAM1_CONFIGURATION_TAG ( "Stream1" ) 
 #define CAMERA2_CONFIGURATION_TAG ( "Camera2" ) 
@@ -18,7 +19,7 @@
 
 
 
-int StoreConfiguration( PvDevice *aDevice, PvStream *aStream, bool camera = true );
+int StoreConfiguration( const PvDeviceInfo *aDeviceInfo, PvDevice *aDevice, PvStream *aStream, bool camera = true );
 
 
 PvDevice *RestoreDevice( bool camera = true );

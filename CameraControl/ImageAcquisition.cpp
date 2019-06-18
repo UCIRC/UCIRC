@@ -1,6 +1,6 @@
 #include "lib/ImageAcquisition.h"
 
-PV_INIT_SIGNAL_HANDLER();
+//PV_INIT_SIGNAL_HANDLER();
 
 
 bool AcquireImages( Camera *aCamera, PvPropertyList *GeneralParams )
@@ -102,7 +102,9 @@ bool AcquireImages( Camera *aCamera, PvPropertyList *GeneralParams )
 				string file = Directory;
 				std::ostringstream o;
 				o << time_buf;
+				file += aCamera->Name.GetAscii();
 				file += o.str();
+				file += "("+to_string(i)+")";
 				file += ".raw";
 				
 				//Convert to PvString
@@ -131,7 +133,8 @@ bool AcquireImages( Camera *aCamera, PvPropertyList *GeneralParams )
 
 			cout << "Realeasing Buffer" << endl;
             // Release the buffer back to the pipeline
-            aPipeline->ReleaseBuffer( lBuffer );
+            lResult = aPipeline->ReleaseBuffer( lBuffer );
+			cout << lResult.GetCodeString().GetAscii() << endl;
 			cout << "Buffer Released" << endl;
         }
         else

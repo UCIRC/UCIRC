@@ -1,6 +1,6 @@
 SRC_CPPS = \
 		   EditConfig.cpp \
 
-EXEC     = EditConfig
+EXEC     = ../EditConfig
 
 include ../sample.Makefile

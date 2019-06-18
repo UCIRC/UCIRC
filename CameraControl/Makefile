@@ -5,6 +5,6 @@ SRC_CPPS = \
 		   BackupConnection.cpp \
 		   Camera.cpp \
 
-EXEC     = CameraControl
+EXEC     = ../Collection
 
 include ../sample.Makefile

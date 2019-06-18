@@ -42,12 +42,20 @@ int main(void){
 
 	Camera *Camera_1 = NewCamera( lName_1 );
 	cout << "Camera Created" << endl;
+
 	
 	if( SetupCamera( Camera_1, true, lBufferCount ) )
 	{
-		AcquireImages( Camera_1, GeneralParams );
+	
+		char c;
+		cout << "Press Ctrl + D to terminate" << endl;
+		while(cin>>c)
+		{	
+			if(Camera_1->Device->IsConnected()) cout << "YES" << endl;
+			else cout << "NO" << endl;
+		}
+	//	AcquireImages( Camera_1, GeneralParams );
 	}
-
 	cout << "Cleaning up..." << endl;
 	FreeCameraInfo(Camera_1);
 	delete Camera_1;

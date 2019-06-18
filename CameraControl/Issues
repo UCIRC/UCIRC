@@ -1,0 +1,14 @@
+Need to set up continuous connectiona and autonomous collection
+Saving The correct configuration to a file that the SDK can read
+
+Issues to be fixed:
+	Seg Fault on Connect by Name
+	TIMEOUT errors and Seg fualts when taking multiple pictures at once
+		Suspected to be particularity of the VIENTOG-14BitMonoThrough Configuration, will investigate
+
+Things to Explore
+	Dynamic Connection Recovery
+
+Things to write
+	Python Script for averaging multiple Images
+

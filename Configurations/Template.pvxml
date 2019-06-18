@@ -81,8 +81,8 @@
     <parameter name="targetframerate">30</parameter>
     <parameter name="deinterlacing">deinterlacingweavinghalf</parameter>
   </propertylist>
-  <device name="" version="1.0">
-    <mac>00:11:1c:03:09:12</mac>
+  <device name="Camera" version="1.0">
+    <mac>00:00:00:00:00:00</mac>
     <accesstype>control</accesstype>
     <communication>
       <parameter name="AnswerTimeout">1000</parameter>
@@ -110,8 +110,8 @@
       <parameter name="OffsetY">0</parameter>
       <parameter name="PixelFormat">Mono14</parameter>
       <parameter name="TestPattern">Off</parameter>
-      <parameter name="AcquisitionMode">SingleFrame</parameter>
-      <parameter name="AcquisitionFrameCount">1</parameter>
+      <parameter name="AcquisitionMode">MultiFrame</parameter>
+      <parameter name="AcquisitionFrameCount">6</parameter>
       <parameter name="AcquisitionFrameToSkip">0</parameter>
       <parameter name="ActionUnconditionalMode">Off</parameter>
       <parameter name="PixelBusDataValidEnabled">0</parameter>
@@ -274,8 +274,8 @@
       <parameter name="PlcCtrlSelector">PlcCtrl0</parameter>
     </device>
   </device>
-  <stream name="" version="1.0">
-    <mac>00:11:1c:03:09:12</mac>
+  <stream name="Stream" version="1.0">
+    <mac>00:00:00:00:00:00</mac>
     <channel>0</channel>
     <parameters>
       <parameter name="FirstPacketTimeout">0</parameter>

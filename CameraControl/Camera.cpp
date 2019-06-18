@@ -1,13 +1,5 @@
 #include "lib/Camera.h"
 
-PvDevice *ConnectToDevice( const PvString &aConnectionID );
-PvStream *OpenStream( const PvString &aConnectionID );
-PvPipeline *CreatePipeline( PvDevice *aDevice, PvStream *aStream, int64_t aBufferCount );
-void clean_up( PvDevice *lCamera, PvStream *lStream );
-int disconnect( PvDevice *lCamera );
-int close_stream ( PvStream *lStream );
-void ConfigureStream( PvDevice *aDevice, PvStream *aStream );
-
 Camera *NewCamera( PvString aName )
 {
 	Camera *aCamera = new Camera;
@@ -25,7 +17,9 @@ void FreeCameraInfo( Camera *aCamera )
 	aCamera->Stream = NULL;
 	if ( aCamera->DeviceInfo != NULL )
 	{
+		cout << "TTTESS" << endl;
 		delete aCamera->DeviceInfo;
+		cout << "Test" << endl;
 		aCamera->DeviceInfo = NULL;
 	}
 	if ( aCamera->Pipeline != NULL )
@@ -40,11 +34,11 @@ bool SetupCamera( Camera *aCamera, bool select, int64_t aBufferCount )
 {
 	PvSystem lSystem;
 	PvResult lResult;
-	PvDevice *lDevice;
-	PvStream *lStream;
-	const PvDeviceInfo *lDeviceInfo;
+	PvDevice *lDevice = NULL;
+	PvStream *lStream = NULL;
+	const PvDeviceInfo *lDeviceInfo = NULL;
 	PvString lConnectionID;
-	PvPipeline *lPipeline;
+	PvPipeline *lPipeline = NULL;
 	bool Connected = false;
 
 	//Attempt To restore Connection
@@ -85,13 +79,18 @@ bool SetupCamera( Camera *aCamera, bool select, int64_t aBufferCount )
 					aCamera->Stream = lStream;
 					Connected = true;
 					cout << "Storing New Configuration" << endl;
-					StoreConfiguration( lDevice, lStream, select );
+					StoreConfiguration( lDeviceInfo, lDevice, lStream, select );
+					exit(0);
 				}
 			}
 		}
 		else { cout << lResult.GetCodeString().GetAscii() << endl; }
 	}
 
+/*
+This Method of connection is slated for deletion;
+It doesn't give reliable connections as the SDK
+Switches the order of devices on each consecutive Search
 	if ( !Connected )
 	{
 		cout << "Attempting to connect via Backup..." << endl;
@@ -117,20 +116,34 @@ bool SetupCamera( Camera *aCamera, bool select, int64_t aBufferCount )
 			}
 		}
 	}
-
+*/
 	if ( !Connected )
 	{
 		cout << "Critical Connection Failure" << endl;
 		FreeCameraInfo( aCamera );
 		return false;
 	}
+/*
+	PvGenParameterArray *test = lDevice->GetCommunicationParameters();
+	PvGenParameter *pt = NULL;
+	for( uint32_t i = 0; i<test->GetCount() ; i++ )
+	{
+		pt = test->Get(i);
+		cout << pt->GetName().GetAscii() << " : " << pt->ToString().GetAscii() << endl;
+	}
+
+	delete test;
+*/		
+
+	
+
 
 	cout << "Configuring Stream..." << endl;
 	ConfigureStream( lDevice, lStream );
 	cout << "Stream Configured" << endl; 	
-
+	
 	cout << "Creating Pipeline..." << endl;
-	lPipeline = CreatePipeline( lDevice, lStream, aBufferCount );
+	lPipeline = CreatePipeline( lDevice, lStream, 16 );
 	if ( lPipeline == NULL )
 	{
 		cout << "Failed to creat Pipeline" << endl;
@@ -217,6 +230,7 @@ void clean_up( PvDevice *lCamera, PvStream *lStream )
 		cout << "Freeing Stream" << endl;
 		PvStream::Free( lStream );
 	}
+	cout << "Stream and Camera Cleaned" << endl;
 	return; 
 }
 
